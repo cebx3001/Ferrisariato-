@@ -11,8 +11,8 @@
 - `XR8.XrController.configure({disableWorldTracking:false,scale:'responsive'})`. Se evita reiniciar la escala relativa con la cámara en movimiento.
 - `hitTest` únicamente en `onUpdate` del módulo cuando `processCpuResult.reality` trae datos: evita consultas prematuras que en Gaussian-AR causaban errores internos. Se prefieren superficies detectadas/estimadas, con `FEATURE_POINT` como respaldo, y filtrado de inclinación cuando la superficie detectada trae orientación.
 - Retícula suavizada siguiendo el rayo central al plano horizontal; altura de apoyo por mediana; colocación fija con copia de coordenadas, sin seguimiento posterior de la retícula.
-- HOME: en móviles, modo 8th Wall SLAM por defecto tanto en Safari iOS como Chrome Android. Los tres GLB, selector, rotación y escala se conservan. El modo WebXR nativo permanece disponible con `?tracking=native`.
-- IN-STORE: mismo método de seguimiento para AR del suelo PISOS, conservando los cuatro acabados y el reveal radial único. El modo WebXR nativo permanece con `?tracking=native`.
+- HOME: ARCore mediante WebXR es el seguimiento principal en Android compatible; 8th Wall SLAM se usa en iPhone y como fallback de Android cuando WebXR no está disponible o falla. Los tres GLB, selector, rotación y escala se conservan. `?tracking=xr8` permite probar el fallback manualmente.
+- IN-STORE: misma prioridad automática Android ARCore/WebXR > 8th Wall fallback; iPhone > 8th Wall. Conserva los cuatro acabados y el reveal radial único.
 - Responsive: el contenido de escritorio continúa como catálogo/visor 3D y simulación; en móvil, la interfaz da acceso a XR Engine con cámara.
 
 ## Requisito de publicación del motor binario

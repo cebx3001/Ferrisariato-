@@ -3,6 +3,6 @@
   "name": "ferrisariato-webar",
   "version": "1.0.0",
   "type": "module",
-  "scripts": {"prepare:xr": "node scripts/copy-xr-engine.mjs", "test:xr": "node test-xr8.mjs"},
+  "scripts": {"prepare:xr": "node scripts/copy-xr-engine.mjs", "test:xr": "node test-xr8.mjs && node test-tracking-policy.mjs"},
   "dependencies": {"@8thwall/engine-binary": "1.0.0"}
 }

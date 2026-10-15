@@ -1,6 +1,7 @@
 // Real PlayCanvas GLB viewer + native WebXR hit testing. No simulated AR tracking.
 import * as pc from 'https://cdn.jsdelivr.net/npm/playcanvas@2.22.6/build/playcanvas.mjs';
 import {XR8Tracking,loadXR8} from './xr8-provider.js';
+import {preferredTracking} from '../../shared/tracking-policy.js';
 // The official XR8.PlayCanvas adapter expects the global pc symbol.
 globalThis.pc = pc;
 import {PRODUCTS} from './products.js';
@@ -23,13 +24,19 @@ export class FerrisARViewer {
   this.active=null;this.item=null;this.rootModel=null;this.assetCache=new Map();this.selectedToken=0;this.yaw=0;this.scale=1;this.orbitYaw=22;this.orbitPitch=21;this.distance=5.6;this.drag=false;this.lastPointer=null;this.pointers=new Map();
   this._cameraLook();this.app.on('update',()=>this._update());this.app.start();
   this.app.xr.on('end',()=>this._xrEnded());this.app.xr.on('error',e=>this.onStatus('Error WebXR: '+(e?.message||e),true));
-  this._wirePointer();if(this.xr8Available)loadXR8().catch(e=>console.warn('[8th Wall preload]',e.message));this.resize();window.addEventListener('resize',()=>this.resize());
+  this._wirePointer();this.nativeSupported=false;this.pendingXR8Fallback=false;this.resize();window.addEventListener('resize',()=>this.resize());
  }
  _cameraLook(){if(this.session)return;let yaw=this.orbitYaw*Math.PI/180,p=this.orbitPitch*Math.PI/180;let px=this.distance*Math.sin(yaw)*Math.cos(p),py=this.distance*Math.sin(p)+1.45,pz=this.distance*Math.cos(yaw)*Math.cos(p);this.camera.setPosition(px,py,pz);this.camera.lookAt(0,1.14,0);}
  resize(){this.app.resizeCanvas(this.canvas.clientWidth||window.innerWidth,this.canvas.clientHeight||window.innerHeight);}
  get xr8Available(){return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || navigator.maxTouchPoints>1;}
+ get isIOS(){return /iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);}
  get arAvailable(){return !!(this.app.xr.supported && this.app.xr.isAvailable(pc.XRTYPE_AR));}
- async checkAR(){try{return Boolean(navigator.xr && await navigator.xr.isSessionSupported('immersive-ar'));}catch{return false;}}
+ get preferredTracking(){return preferredTracking({mobile:this.xr8Available,ios:this.isIOS,nativeSupported:this.nativeSupported,xr8Available:this.xr8Available,override:new URLSearchParams(location.search).get('tracking')});}
+ async checkAR(){
+  try{this.nativeSupported=Boolean(!this.isIOS&&navigator.xr&&await navigator.xr.isSessionSupported('immersive-ar')&&this.arAvailable);}catch{this.nativeSupported=false;}
+  if(this.xr8Available&&!this.nativeSupported)loadXR8().catch(e=>console.warn('[8th Wall fallback preload]',e.message));
+  return this.nativeSupported;
+ }
  _loadGLB(url){if(this.assetCache.has(url))return this.assetCache.get(url);const promise=new Promise((resolve,reject)=>{this.app.assets.loadFromUrl(url,'container',(error,asset)=>{if(error){reject(new Error(typeof error==='string'?error:'No se pudo cargar '+url));return;}resolve(asset);});});this.assetCache.set(url,promise);promise.catch(()=>this.assetCache.delete(url));return promise;}
  async _instantiate(url){const asset=await this._loadGLB(url);return asset.resource.instantiateRenderEntity({castShadows:false});}
  _clear(){if(this.rootModel){this.rootModel.destroy();this.rootModel=null;}this.marker.enabled=false;}
@@ -65,12 +72,12 @@ export class FerrisARViewer {
  }
  // IMPORTANT: startXR() is called directly inside a user click. Nothing awaits before starting session.
  startXR(){if(this.session)return;this.xrBackend='native';this.app.xr.domOverlay.root=document.getElementById('shell');this.hasPlaced=false;this.moving=false;this._destroyAnchor();this.marker.enabled=false;this.productRoot.enabled=false;
-  this.app.xr.start(this.camera.camera,pc.XRTYPE_AR,pc.XRSPACE_LOCALFLOOR,{planeDetection:true,anchors:true,callback:(err)=>{if(err){this.onStatus('No se pudo iniciar AR: '+(err.message||err),true);this._xrEnded();}}});
-  this.app.xr.once('start',()=>{this.session=true;this.onTracking(true);this.onStatus('Busca una superficie horizontal moviendo lentamente la cámara.');if(!this.app.xr.hitTest.supported){this.onStatus('Este dispositivo no ofrece hit testing de superficies.',true);return;}
+  this.app.xr.start(this.camera.camera,pc.XRTYPE_AR,pc.XRSPACE_LOCALFLOOR,{planeDetection:true,anchors:true,callback:(err)=>{if(err){this.pendingXR8Fallback=this.xr8Available;this.onStatus('ARCore/WebXR no pudo iniciar: '+(err.message||err),true);this._xrEnded();}}});
+  this.app.xr.once('start',()=>{this.session=true;this.onTracking(true);this.onStatus('Busca una superficie horizontal moviendo lentamente la cámara.');if(!this.app.xr.hitTest.supported){this.onStatus('WebXR no ofrece hit testing. Cambiando a 8th Wall.',true);this.pendingXR8Fallback=this.xr8Available;this.app.xr.end();return;}
    this.app.xr.hitTest.start({spaceType:pc.XRSPACE_VIEWER,callback:(err,source)=>{if(err){this.onStatus('No se pudo detectar el suelo: '+(err.message||err),true);return;}this.hitSource=source;source.on('result',(pos,rotation,input,result)=>{this.hit=pos.clone();this.hitResult=result;this.lastHitAt=performance.now();if(!this.hasPlaced){this.marker.setPosition(pos.x,pos.y+.008,pos.z);this.marker.enabled=true;this.onStatus('Superficie detectada. Pulsa COLOCAR EN TU ESPACIO.');}});}});
   });
  }
- endXR(){if(this.xrBackend==='xr8'){this.xr8Tracking?.stop();return;}if(this.app.xr.active)this.app.xr.end();else this._xrEnded();}
- _xrEnded(){this.session=false;this.xrBackend=null;this._destroyAnchor();try{this.hitSource?.remove();}catch{}this.hitSource=null;this.hit=null;this.marker.enabled=false;this.productRoot.setPosition(0,0,0);this.productRoot.enabled=true;this.hasPlaced=true;this._cameraLook();this.onTracking(false);this.onStatus('Vista 3D de demostración.');}
+ endXR(){this.pendingXR8Fallback=false;if(this.xrBackend==='xr8'){this.xr8Tracking?.stop();return;}if(this.app.xr.active)this.app.xr.end();else this._xrEnded();}
+ _xrEnded(){const fallback=this.pendingXR8Fallback&&this.xr8Available;this.pendingXR8Fallback=false;this.session=false;this.xrBackend=null;this._destroyAnchor();try{this.hitSource?.remove();}catch{}this.hitSource=null;this.hit=null;this.marker.enabled=false;this.productRoot.setPosition(0,0,0);this.productRoot.enabled=true;this.hasPlaced=true;this._cameraLook();this.onTracking(false);this.onStatus('Vista 3D de demostración.');if(fallback){this.onStatus('ARCore no disponible. Activando seguimiento 8th Wall.');void this.startXR8();}}
  _update(){if(!this.session)return;if(this.anchor&&this.hasPlaced){try{const pos=this.anchor.getPosition();this.productRoot.setPosition(pos);}catch{}}}
 }

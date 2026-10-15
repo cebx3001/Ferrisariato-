@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import {preferredTracking} from './shared/tracking-policy.js';
+const t=(title,input,expected)=>assert.equal(preferredTracking(input),expected,title);
+t('Android ARCore supported',{mobile:true,ios:false,nativeSupported:true,xr8Available:true},'native');
+t('Android ARCore missing',{mobile:true,ios:false,nativeSupported:false,xr8Available:true},'xr8');
+t('iPhone',{mobile:true,ios:true,nativeSupported:false,xr8Available:true},'xr8');
+t('iPhone with WebXR capability',{mobile:true,ios:true,nativeSupported:true,xr8Available:true},'xr8');
+t('Desktop',{mobile:false,ios:false,nativeSupported:true,xr8Available:true},'none');
+t('Force fallback for debugging',{mobile:true,ios:false,nativeSupported:true,xr8Available:true,override:'xr8'},'xr8');
+console.log('PASS: Android ARCore first, 8th Wall fallback, iPhone 8th Wall');
