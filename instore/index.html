@@ -105,9 +105,8 @@
  </div>
  <div class="qr-modal" id="qr-modal" hidden><div class="qr-panel"><button id="qr-close" type="button" aria-label="Cerrar">×</button><p class="eyebrow">ESTACIÓN 02 / PISOS</p><h2>ESCANEA<br/>Y CONSTRUYE.</h2><div id="qr-code" class="qr-code"></div><p>Este QR lleva a la experiencia PISOS cuando publiques el proyecto en una dirección HTTPS accesible.</p><code id="qr-url"></code><button type="button" id="qr-copy" class="cta cta-yellow">COPIAR ENLACE ↗</button></div></div>
  <script type="module">
-import {FloorWebXR} from "./js/webxr-floor.js";
 let liveXR=null;
-(async()=>{try{liveXR=new FloorWebXR();await liveXR.ready;}catch(e){console.warn("XR unavailable",e);}})();
+(async()=>{try{const {FloorWebXR}=await import("./js/webxr-floor.js");liveXR=new FloorWebXR();await liveXR.ready;}catch(e){console.warn("XR unavailable",e);}})();
 const STATIONS = [
   {id:'01', title:'CONSTRUCCIÓN'}, {id:'02', title:'PISOS',active:true},
   {id:'03', title:'PINTURA'}, {id:'04', title:'ILUMINACIÓN'},
