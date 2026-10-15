@@ -1,0 +1,10 @@
+import {cpSync,existsSync,mkdirSync,readdirSync,statSync} from 'node:fs';
+import {resolve} from 'node:path';
+const source=resolve('node_modules/@8thwall/engine-binary/dist');
+const destination=resolve('external/xr');
+if(!existsSync(source))throw new Error('Falta @8thwall/engine-binary/dist. Ejecuta npm install.');
+if(!existsSync(resolve(source,'xr.js')))throw new Error('XR Engine no contiene xr.js; revisa la versión.');
+mkdirSync(destination,{recursive:true});
+cpSync(source,destination,{recursive:true,force:true});
+const files=readdirSync(destination);console.log('XR Engine original copiado sin modificaciones a external/xr:',files.join(', '));
+if(!existsSync(resolve(destination,'LICENSE')))console.warn('Verifica el aviso de licencia distribuido con XR Engine.');

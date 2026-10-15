@@ -1,0 +1,37 @@
+name: Sync unmodified XR Engine for static GitHub Pages
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'package.json'
+      - 'scripts/copy-xr-engine.mjs'
+      - '.github/workflows/sync-xr-engine.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  copy-xr:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check 8th Wall tracking adapter state flow
+        run: npm run test:xr
+      - name: Install the same XR Engine as Gaussian-AR
+        run: npm install --no-audit --no-fund --ignore-scripts
+      - name: Copy the original engine and its license
+        run: npm run prepare:xr
+      - name: Add untouched XR Engine files for GitHub Pages branch hosting
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f external/xr
+          if ! git diff --cached --quiet; then
+            git commit -m 'build: include unmodified XR Engine for WebAR [skip ci]'
+            git push origin HEAD:main
+          fi
