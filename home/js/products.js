@@ -1,121 +1,92 @@
 export const PRODUCTS=[
   {
-    "id": "sofa",
-    "name": "SOFÁ EXTERIOR",
-    "category": "SALA EXTERIOR",
-    "short": "Sofá exterior con cojines",
-    "description": "Convierte tu terraza en un espacio para relajarte. Un diseño de líneas cálidas y textura tejida que aporta comodidad y personalidad a cualquier ambiente exterior.",
-    "thumb": "./assets/img/sofa-exterior-preview.png",
-    "local": "./assets/models/sofa-exterior.glb",
-    "pack": {
-      "name": "sofa-exterior",
-      "parts": 13
-    },
-    "remote": null,
-    "modelReady": true,
-    "dimensions": [
-      7.63,
-      2.54,
-      6.49
-    ],
-    "source": "Archivos originales del usuario convertidos a GLB; Shelzong en fotografía"
-  },
-  {
-    "id": "sombrilla",
-    "name": "SOMBRILLA DOBLE",
+    "id": "umbrella",
+    "name": "SOMBRILLA",
     "category": "EXTERIORES",
-    "short": "Sombrilla de exterior",
-    "description": "Crea una zona de sombra y disfruta de tus espacios al aire libre. Su amplia cubierta transforma patios, jardines y terrazas.",
-    "thumb": "./assets/img/sombrilla-preview.png",
-    "local": "./assets/models/sombrilla.glb",
-    "pack": {
-      "name": "sombrilla",
-      "parts": 1
-    },
-    "remote": null,
-    "modelReady": true,
-    "dimensions": [
-      3.48,
-      3.27,
-      2.69
-    ],
-    "source": "Archivos originales del usuario convertidos a GLB; Shelzong en fotografía"
-  },
-  {
-    "id": "daybed",
-    "name": "SUNRAY DAYBED",
-    "category": "DESCANSO",
-    "short": "Daybed de diseño contemporáneo",
-    "description": "Un rincón para descansar bajo el sol. Una pieza de exterior de diseño contemporáneo que invita a disfrutar del jardín o la terraza con mayor comodidad.",
-    "thumb": "./assets/img/sunray-daybed-preview.png",
-    "local": "./assets/models/sunray-daybed.glb",
-    "pack": {
-      "name": "sunray-daybed",
-      "parts": 13
-    },
-    "remote": null,
-    "modelReady": true,
-    "dimensions": [
-      0.87,
-      0.59,
-      2.02
-    ],
-    "source": "Archivos originales del usuario convertidos a GLB; Shelzong en fotografía"
-  },
-  {
-    "id": "mesa",
-    "name": "MESA Y SILLAS",
-    "category": "COMEDOR EXTERIOR",
-    "short": "Mesa con sillas",
-    "description": "Imagina tus próximas reuniones al aire libre. Un conjunto práctico para compartir comidas, conversar y aprovechar cada rincón de tu patio o terraza.",
-    "thumb": "./assets/img/mesa-exterior-preview.png",
-    "local": "./assets/models/mesa-exterior.glb",
-    "pack": {
-      "name": "mesa-exterior",
-      "parts": 2
-    },
-    "remote": null,
-    "modelReady": true,
-    "dimensions": [
-      2.06,
-      0.97,
-      2.42
-    ],
-    "source": "Archivos originales del usuario convertidos a GLB; Shelzong en fotografía"
-  },
-  {
-    "id": "grill",
-    "name": "PARRILLA EXTERIOR",
-    "category": "COCINA EXTERIOR",
-    "short": "Parrilla para patio",
-    "description": "Prepara el escenario para tu próxima reunión. Descubre cómo se integra una parrilla en tu patio y encuentra el lugar ideal para compartir.",
-    "thumb": "./assets/img/parrilla-preview.png",
-    "local": "./assets/models/parrilla.glb",
-    "pack": {
-      "name": "parrilla",
-      "parts": 4
-    },
-    "remote": null,
-    "modelReady": true,
-    "dimensions": [
-      1.5,
-      1.83,
-      1.56
-    ],
-    "source": "Archivos originales del usuario convertidos a GLB; Shelzong en fotografía"
-  },
-  {
-    "id": "shelzong",
-    "name": "REPOSERA BEACH",
-    "category": "DESCANSO",
-    "short": "Reposera de playa",
-    "description": "Tu propio espacio de descanso. Una reposera ideal para visualizar una zona de sol, lectura o relajación junto a la piscina o en el jardín.",
-    "thumb": "https://img-new.cgtrader.com/items/3893356/bf92ac9af5/shelzong-beach-3d-model-bf92ac9af5.webp",
-    "local": null,
+    "short": "Sombrilla para patio y jardín",
+    "description": "Visualiza esta sombrilla directamente en tu espacio.",
+    "thumb": "./assets/img/umbrella.png",
+    "local": "./assets/models/umbrella.glb",
     "pack": null,
     "remote": null,
-    "modelReady": false,
-    "dimensions": null,
-    "source": "Archivos originales del usuario convertidos a GLB; Shelzong en fotografía"
+    "modelReady": true,
+    "dimensions": [
+      2.8,
+      0.0536,
+      2.8
+    ],
+    "source": "Modelo original enviado por el usuario"
+  },
+  {
+    "id": "chair",
+    "name": "SILLA EXTERIOR",
+    "category": "MOBILIARIO",
+    "short": "Silla de diseño",
+    "description": "Explora la silla en tres dimensiones y prueba su ubicación.",
+    "thumb": "./assets/img/chair.png",
+    "local": "./assets/models/chair.glb",
+    "pack": null,
+    "remote": null,
+    "modelReady": true,
+    "dimensions": [
+      0.85,
+      1.1924,
+      0.8298
+    ],
+    "source": "Modelo original enviado por el usuario"
+  },
+  {
+    "id": "format1",
+    "name": "FORMAT 1",
+    "category": "MOBILIARIO",
+    "short": "Modelo tridimensional original",
+    "description": "Visualiza el modelo con su geometría y materiales originales.",
+    "thumb": "./assets/img/format1.png",
+    "local": "./assets/models/format1.glb",
+    "pack": null,
+    "remote": null,
+    "modelReady": true,
+    "dimensions": [
+      2.0,
+      1.4872,
+      1.9994
+    ],
+    "source": "Modelo original enviado por el usuario"
+  },
+  {
+    "id": "poltrona",
+    "name": "POLTRONA PL 461",
+    "category": "DESCANSO",
+    "short": "Sillón de diseño",
+    "description": "Descubre el sillón en tu terraza o espacio interior.",
+    "thumb": "./assets/img/poltrona.png",
+    "local": "./assets/models/poltrona.glb",
+    "pack": null,
+    "remote": null,
+    "modelReady": true,
+    "dimensions": [
+      1.05,
+      0.496,
+      1.05
+    ],
+    "source": "Modelo original enviado por el usuario"
+  },
+  {
+    "id": "patio",
+    "name": "PATIO SET",
+    "category": "CONJUNTO EXTERIOR",
+    "short": "Conjunto con madera y cojines texturizados",
+    "description": "Conjunto de patio con materiales PBR de madera y textiles.",
+    "thumb": "./assets/img/patio.png",
+    "local": "./assets/models/patio-set.glb",
+    "pack": null,
+    "remote": null,
+    "modelReady": true,
+    "dimensions": [
+      3.696,
+      2.0,
+      2.7194
+    ],
+    "source": "Modelo original enviado por el usuario"
   }
 ];
