@@ -84,7 +84,7 @@ export const PRODUCTS=[
     "modelReady": true,
     "dimensions": [
       3.696,
-      2.0,
+      0.779,
       2.7194
     ],
     "source": "Modelo original enviado por el usuario"
