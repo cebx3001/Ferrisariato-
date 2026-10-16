@@ -3,27 +3,31 @@ const $=s=>document.getElementById(s), storeKey='ferrisariato-home-saved-v1';
 let viewer=null,engineReady=false,selected=PRODUCTS[0],saved=new Set(),mode='studio',modelPlaced=true,moving=false,rotation=0,scale=1;let toastTimer=0;
 try{saved=new Set(JSON.parse(localStorage.getItem(storeKey)||'[]'));}catch{}
 
-// Concept mode keeps the previous PlayCanvas/WebXR files untouched for future GLB activation.
+// Five real user-supplied models load in PlayCanvas; the sixth stays as photo reference.
 const MOCKUP=PRODUCTS.every(p=>!p.modelReady);
 function updateConcept(){
  const root=$('viewer'),photo=$('concept-photo');
  root.classList.toggle('is-concept',!selected.modelReady);
  if(!selected.modelReady){
-  photo.src=selected.thumb;photo.alt=selected.name;photo.onerror=()=>{photo.onerror=null;photo.src='./assets/img/terraza-referencia.jpg';};
+  photo.src=selected.thumb;photo.alt=selected.name;photo.onerror=()=>{photo.onerror=null;photo.src=selected.previewThumb||'./assets/img/terraza-referencia.jpg';};
   $('concept-title').textContent=selected.name;
   $('concept-category').textContent='FERRISARIATO / '+selected.category;
   $('concept-description').textContent=selected.description;
   $('concept-source').href=selected.source;
   $('mode-label').textContent='REFERENCIA VISUAL';
   hint('SELECCIONA UN PRODUCTO PARA EXPLORAR');
+ }else{
+  $('mode-label').textContent='MODELO 3D ORIGINAL';
+  hint('ARRASTRA PARA GIRAR · PELLIZCA PARA ZOOM');
  }
+ $('mode-ar').innerHTML=selected.modelReady?'VER EN AR <span>↗</span>':'AR PRÓXIMAMENTE <span>↗</span>';
 }
 
 const hint=value=>{const el=document.getElementById('gesture-hint');if(el)el.textContent=value;};
 const setMessage=(message,error=false)=>{const elem=$('guidance');elem.innerHTML=`<b>${error?'ATENCIÓN':'VISUALIZA EN TU ESPACIO'}</b><span>${message.replaceAll('<','&lt;').replaceAll('>','&gt;')}</span>`;if(error){$('mobile-status').textContent=message;$('mobile-status').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('mobile-status').hidden=true,4600);}};
 function renderProducts(){
- $('products').innerHTML=PRODUCTS.map((p,i)=>`<button type="button" data-product="${p.id}" class="product-card ${selected.id===p.id?'selected':''}" aria-pressed="${selected.id===p.id}"><img src="${p.thumb}" alt="${p.name}"/><span class="product-desc"><small>0${i+1} / ${p.category}</small><strong>${p.name}</strong><span class="meta">${p.short}</span></span><span class="card-arrow">↗</span></button>`).join('');
- $('selected-thumb').src=selected.thumb;$('selected-title').textContent=selected.name;$('selected-dim').textContent=selected.dimensions?selected.dimensions[0].toFixed(2)+' × '+selected.dimensions[2].toFixed(2)+' m':'VISTA DE REFERENCIA · MODELO 3D PENDIENTE';updateSaved();
+ $('products').innerHTML=PRODUCTS.map((p,i)=>`<button type="button" data-product="${p.id}" class="product-card ${selected.id===p.id?'selected':''}" aria-pressed="${selected.id===p.id}"><img src="${p.thumb}" alt="${p.name}" onerror="this.onerror=null;this.src='${p.previewThumb||'./assets/img/terraza-referencia.jpg'}'"/><span class="product-desc"><small>0${i+1} / ${p.category}</small><strong>${p.name}</strong><span class="meta">${p.short}</span></span><span class="card-arrow">↗</span></button>`).join('');
+ $('selected-thumb').src=selected.thumb;$('selected-thumb').onerror=()=>{$('selected-thumb').onerror=null;$('selected-thumb').src=selected.previewThumb||'./assets/img/terraza-referencia.jpg';};$('selected-title').textContent=selected.name;$('selected-dim').textContent=selected.dimensions?selected.dimensions[0].toFixed(2)+' × '+selected.dimensions[2].toFixed(2)+' m':'VISTA DE REFERENCIA · MODELO 3D PENDIENTE';updateSaved();
 }
 function updateSaved(){$('fav').textContent=saved.has(selected.id)?'♥':'♡';$('fav').classList.toggle('saved',saved.has(selected.id));$('save-count').textContent=String(saved.size).padStart(2,'0');}
 function persistSaved(){try{localStorage.setItem(storeKey,JSON.stringify([...saved]));}catch{}}
