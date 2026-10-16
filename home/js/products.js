@@ -78,8 +78,8 @@ export const PRODUCTS=[
     "modelReady": true,
     "dimensions": [
       2.06,
-      2.42,
-      0.97
+      0.97,
+      2.42
     ],
     "source": "Archivos originales del usuario convertidos a GLB; Shelzong en fotografía"
   },
