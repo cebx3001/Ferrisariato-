@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="es">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ferrisariato · Comparación visual</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#061526;color:#eef5ff;font:16px/1.5 system-ui,sans-serif}main{max-width:1100px;margin:auto;padding:32px 24px}small{color:#ffcc26;letter-spacing:.15em;font-weight:700}h1{font-size:clamp(28px,5vw,48px);line-height:1.08;margin:12px 0}p{color:#bdccdc;max-width:760px}a{color:#ffda63}nav{display:flex;gap:24px;flex-wrap:wrap;margin:24px 0}.comparison{position:relative;max-width:704px;aspect-ratio:4/5;overflow:hidden;background:#07203a;border:1px solid #52667e;border-radius:8px;--split:50%}.comparison img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}.before{clip-path:inset(0 calc(100% - var(--split)) 0 0)}.divider{position:absolute;left:var(--split);top:0;bottom:0;width:2px;background:#ffce25;pointer-events:none}.label{position:absolute;top:14px;padding:6px 12px;background:#04121fe6;border:1px solid #7b94ae;border-radius:4px;font-size:12px;font-weight:700}.left{left:14px}.right{right:14px}.slider{max-width:704px;padding:16px 0}input{width:100%;accent-color:#ffcc26}label{font-size:14px}.note{font-size:13px;color:#93acc4}.facts{display:flex;flex-wrap:wrap;gap:22px;margin:25px 0;padding:20px 0;border-top:1px solid #33485f;border-bottom:1px solid #33485f}.facts b{display:block;color:white;font-size:25px}.facts span{font-size:12px;color:#b8c8dc}
+</style>
+<main><small>FERRISARIATO / PINBALL</small><h1>La misma mesa.<br>Continuidad, detalle y ensamblaje.</h1>
+<p>Desliza para comparar la versión funcional anterior y la nueva versión, con la misma cámara y los mecanismos en reposo. Ambas imágenes proceden del juego real.</p>
+<nav><a href="premium-hero.png">Render Cycles · 1760 × 2200</a><a href="premium-desktop.png">Partida en escritorio</a><a href="premium-detail-comparison.jpg">Detalles frente a las referencias</a><a href="../PREMIUM_REVIEW.md">Notas de la revisión</a></nav>
+<div class="comparison" id="comparison"><img src="premium-after-table.png" alt="Mesa con materiales, luces, vidrio y miniaturas ampliadas"><img class="before" src="premium-before-table.png" alt="Versión anterior con la misma cámara"><div class="divider"></div><span class="label left">ANTES</span><span class="label right">DESPUÉS</span></div>
+<div class="slider"><label for="split">Comparar versiones</label><input id="split" type="range" min="0" max="100" value="50" aria-label="Porcentaje de imagen anterior visible"></div>
+<div class="facts"><span><b>4.645</b>objetos en la escena</span><span><b>272</b>luces físicas</span><span><b>7/7</b>archivos funcionales idénticos</span><span><b>25 + 12</b>pruebas físicas y de navegador</span></div>
+<p class="note">El vidrio de la versión jugable utiliza una capa de reflexión de lámina delgada. La bola usa acero renderizado en Cycles; sus reflejos no se recalculan mediante ray tracing durante la partida. Física, cámara y controles conservados.</p>
+</main><script>const slider=document.getElementById('split');slider.addEventListener('input',()=>document.getElementById('comparison').style.setProperty('--split',slider.value+'%'));</script>
+</html>

@@ -1,0 +1,33 @@
+{
+  "objects": 4645,
+  "lights": 272,
+  "shared_meshes": 111,
+  "added_objects": 1811,
+  "camera_matrix": [
+    [
+      1.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      0.8189288377761841,
+      -0.5738950967788696,
+      -17.799999237060547
+    ],
+    [
+      0.0,
+      0.5738950967788696,
+      0.8189288377761841,
+      25.5
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "channel_scope": "Continuous visual structure only; original Box2D remains unchanged"
+}

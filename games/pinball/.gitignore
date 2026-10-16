@@ -1,0 +1,4 @@
+blender/*.blend1
+blender/__pycache__/
+tests/__pycache__/
+scripts/__pycache__/

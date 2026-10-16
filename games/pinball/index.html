@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#002a69"><title>Ferrisariato · Pinball</title>
+  <link rel="icon" href="data:,"><link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <main class="arcade">
+    <aside class="intro"><span class="eyebrow">FERRISARIATO / JUEGA</span><h1>UNA CASA.<br>MUCHAS<br><em>POSIBILIDADES.</em></h1><p>Apunta alto. Enciende los siete objetivos y consigue tu mejor puntaje.</p><div class="instructions"><b>ASÍ SE JUEGA</b><p><kbd>←</kbd> <kbd>→</kbd> Mueve las paletas</p><p><kbd>ESPACIO</kbd> Mantén y suelta para lanzar</p><p>En tu teléfono, toca cada mitad de la mesa.</p></div><span class="edition">PINBALL · PRUEBA DE CONCEPTO</span></aside>
+    <section class="machine" aria-label="Mesa de pinball Ferrisariato">
+      <header class="backbox">
+        <img class="brand" src="./assets/logo-ferrisariato.png" alt="Ferrisariato. Más variedad y a menor precio">
+        <div class="scoreboard">
+          <div class="display"><span>PUNTOS</span><output id="score">000.000</output></div>
+          <div class="ball-indicator"><span>BOLAS</span><strong id="balls" aria-label="3 bolas">● ● ●</strong></div>
+          <div class="display timer"><span>TIEMPO</span><output id="time">02:00</output></div>
+        </div>
+      </header>
+      <div class="playfield" id="playfield">
+        <canvas id="table" width="880" height="1320" tabindex="0" aria-label="Pinball. Flechas izquierda y derecha: paletas. Mantén espacio y suelta para lanzar."></canvas>
+        <div class="message" id="message" role="status">PREPARANDO LA MESA…</div>
+        <div class="overlay" id="overlay">
+          <div class="start-card"><span class="eyebrow" id="overlay-tag">3 BOLAS · 2 MINUTOS</span><h2 id="overlay-title">¡A CONSTRUIR<br>TU RÉCORD!</h2><p id="overlay-description">Carga el lanzador, suelta la bola y mantén la partida en juego.</p><button id="start" class="primary" disabled>CARGANDO… <span>↗</span></button><p class="control-hint">← / → PALETAS &nbsp; · &nbsp; ESPACIO LANZADOR</p></div>
+        </div>
+        <div class="charge-meter" aria-hidden="true"><i id="charge"></i></div>
+      </div>
+      <footer class="apron"><div class="flipper-label"><span>←</span> PALETA IZQUIERDA</div><button id="launch" class="launch" aria-label="Mantén para cargar el lanzador y suelta para lanzar"><b>LANZAR ↑</b><small>MANTÉN Y SUELTA</small></button><div class="flipper-label">PALETA DERECHA <span>→</span></div></footer>
+      <nav class="tools" aria-label="Opciones de partida"><button id="sound" aria-pressed="true">SONIDO: SÍ</button><button id="pause" disabled>PAUSAR</button><button id="restart" disabled>REINICIAR ↻</button></nav>
+    </section>
+  </main>
+  <script src="./vendor/box2d.js"></script><script type="module" src="./src/game.js"></script>
+</body>
+</html>

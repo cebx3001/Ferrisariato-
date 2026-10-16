@@ -1,0 +1,54 @@
+{
+  "checks": [
+    "Independent keyboard flippers",
+    "Keyboard charge, release, real lane entry",
+    "Real scoring, countdown and running Web Audio",
+    "All seven independent target contacts, scores and transient lights",
+    "All three main bumpers and both secondary tanks rebound",
+    "Both active slingshots",
+    "Pause freezes time and resumes",
+    "Three losses, game over, restart and time limit",
+    "Desktop rendering average frame work < 20 ms",
+    "Mobile simultaneous multi-touch flippers and independent release",
+    "Touch outside the canvas still activates the corresponding screen half",
+    "Mobile independent plunger, real launch and responsive layout"
+  ],
+  "desktop_performance": {
+    "status": "playing",
+    "score": 300,
+    "remaining": 116.85000000000001,
+    "balls": 3,
+    "charge": 0,
+    "launched": true,
+    "entered": true,
+    "position": {
+      "x": 7.861151148742168,
+      "y": 2.0994668116148483
+    },
+    "velocity": {
+      "x": 7.701167694101237,
+      "y": -0.2003586926382338
+    },
+    "flippers": [
+      {
+        "id": "left",
+        "angle": 0.42
+      },
+      {
+        "id": "right",
+        "angle": 2.721592653589793
+      }
+    ],
+    "hits": {
+      "target-1": 1,
+      "target-2": 1
+    },
+    "lights": {},
+    "paused": false,
+    "frames": 656,
+    "averageFrameMs": 0.5818597560942956,
+    "maxFrameMs": 10.600000000093132
+  },
+  "errors": [],
+  "failed_requests": []
+}

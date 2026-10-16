@@ -1,0 +1,37 @@
+{
+  "table": {
+    "size": [
+      880,
+      1100
+    ],
+    "png_bytes": 1618323
+  },
+  "interactives": {
+    "size": [
+      880,
+      1100
+    ],
+    "png_bytes": 660788
+  },
+  "foreground": {
+    "size": [
+      880,
+      1100
+    ],
+    "png_bytes": 669591
+  },
+  "glass": {
+    "size": [
+      880,
+      1100
+    ],
+    "png_bytes": 1099351
+  },
+  "ball": {
+    "size": [
+      128,
+      128
+    ],
+    "png_bytes": 24321
+  }
+}

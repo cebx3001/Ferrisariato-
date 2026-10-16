@@ -1,0 +1,45 @@
+{
+  "objects": 5003,
+  "lights": 263,
+  "sharedMeshes": 152,
+  "collections": {
+    "Collection": 637,
+    "Foreground decorative raised channels": 330,
+    "Interactive bumper tank target sling art": 434,
+    "Movable elements": 34,
+    "Photographic workshop miniatures": 736,
+    "Precision structural detailing": 570,
+    "Premium structural detailing": 1242,
+    "Protective glass reflections": 34
+  },
+  "camera": {
+    "position": [
+      0.0,
+      -22.0,
+      24.0
+    ],
+    "lens": 58.7154655456543
+  },
+  "render": {
+    "hero": [
+      1320,
+      1980
+    ],
+    "heroSamples": 96,
+    "web": [
+      880,
+      1320
+    ],
+    "webSamples": 48,
+    "engine": "Cycles",
+    "viewTransform": "AgX"
+  },
+  "logoSHA256": "91711c1629c1e5a9566d21417da2b5088ad6f2427009500099cc1f0c9d58d8b3",
+  "fonts": [
+    {
+      "name": "Pinball Segment Regular",
+      "packed": true
+    }
+  ],
+  "rampSamples": 481
+}

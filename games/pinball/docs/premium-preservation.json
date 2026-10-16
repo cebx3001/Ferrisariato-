@@ -1,0 +1,9 @@
+{
+  "layout.json": true,
+  "src/physics.js": true,
+  "src/audio.js": true,
+  "src/game.js": true,
+  "index.html": true,
+  "assets/projection.json": true,
+  "vendor/box2d.js": true
+}

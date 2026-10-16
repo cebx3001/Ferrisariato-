@@ -1,0 +1,184 @@
+TAP version 13
+# Subtest: Real shooter lane enters the field: charge 0
+ok 1 - Real shooter lane enters the field: charge 0
+  ---
+  duration_ms: 318.325555
+  type: 'test'
+  ...
+# Subtest: Real shooter lane enters the field: charge 0.25
+ok 2 - Real shooter lane enters the field: charge 0.25
+  ---
+  duration_ms: 287.618265
+  type: 'test'
+  ...
+# Subtest: Real shooter lane enters the field: charge 0.5
+ok 3 - Real shooter lane enters the field: charge 0.5
+  ---
+  duration_ms: 236.723646
+  type: 'test'
+  ...
+# Subtest: Real shooter lane enters the field: charge 0.75
+ok 4 - Real shooter lane enters the field: charge 0.75
+  ---
+  duration_ms: 274.739207
+  type: 'test'
+  ...
+# Subtest: Real shooter lane enters the field: charge 1
+ok 5 - Real shooter lane enters the field: charge 1
+  ---
+  duration_ms: 241.322367
+  type: 'test'
+  ...
+# Subtest: bumper-top: physical collision, rebound, score and light
+ok 6 - bumper-top: physical collision, rebound, score and light
+  ---
+  duration_ms: 91.425908
+  type: 'test'
+  ...
+# Subtest: bumper-left: physical collision, rebound, score and light
+ok 7 - bumper-left: physical collision, rebound, score and light
+  ---
+  duration_ms: 142.878543
+  type: 'test'
+  ...
+# Subtest: bumper-right: physical collision, rebound, score and light
+ok 8 - bumper-right: physical collision, rebound, score and light
+  ---
+  duration_ms: 95.716424
+  type: 'test'
+  ...
+# Subtest: tank-left: physical collision, rebound, score and light
+ok 9 - tank-left: physical collision, rebound, score and light
+  ---
+  duration_ms: 105.675676
+  type: 'test'
+  ...
+# Subtest: tank-right: physical collision, rebound, score and light
+ok 10 - tank-right: physical collision, rebound, score and light
+  ---
+  duration_ms: 143.543535
+  type: 'test'
+  ...
+# Subtest: target-1: independent contact and light
+ok 11 - target-1: independent contact and light
+  ---
+  duration_ms: 81.810624
+  type: 'test'
+  ...
+# Subtest: target-2: independent contact and light
+ok 12 - target-2: independent contact and light
+  ---
+  duration_ms: 76.318646
+  type: 'test'
+  ...
+# Subtest: target-3: independent contact and light
+ok 13 - target-3: independent contact and light
+  ---
+  duration_ms: 98.388342
+  type: 'test'
+  ...
+# Subtest: target-4: independent contact and light
+ok 14 - target-4: independent contact and light
+  ---
+  duration_ms: 64.447312
+  type: 'test'
+  ...
+# Subtest: target-5: independent contact and light
+ok 15 - target-5: independent contact and light
+  ---
+  duration_ms: 81.380556
+  type: 'test'
+  ...
+# Subtest: target-6: independent contact and light
+ok 16 - target-6: independent contact and light
+  ---
+  duration_ms: 87.885651
+  type: 'test'
+  ...
+# Subtest: target-7: independent contact and light
+ok 17 - target-7: independent contact and light
+  ---
+  duration_ms: 84.917257
+  type: 'test'
+  ...
+# Subtest: sling-left: active triangular rebound
+ok 18 - sling-left: active triangular rebound
+  ---
+  duration_ms: 131.520361
+  type: 'test'
+  ...
+# Subtest: sling-right: active triangular rebound
+ok 19 - sling-right: active triangular rebound
+  ---
+  duration_ms: 86.066459
+  type: 'test'
+  ...
+# Subtest: left: motor sweeps, hits the ball and returns
+ok 20 - left: motor sweeps, hits the ball and returns
+  ---
+  duration_ms: 166.543532
+  type: 'test'
+  ...
+# Subtest: right: motor sweeps, hits the ball and returns
+ok 21 - right: motor sweeps, hits the ball and returns
+  ---
+  duration_ms: 106.329832
+  type: 'test'
+  ...
+# Subtest: Drain decrements lives, respawns and ends on the third loss
+ok 22 - Drain decrements lives, respawns and ends on the third loss
+  ---
+  duration_ms: 126.700968
+  type: 'test'
+  ...
+# Subtest: Timer is real simulation time; reset clears score, lights, controls and lives
+ok 23 - Timer is real simulation time; reset clears score, lights, controls and lives
+  ---
+  duration_ms: 129.304161
+  type: 'test'
+  ...
+# Subtest: High-speed ball respects both side walls with continuous collision detection
+ok 24 - High-speed ball respects both side walls with continuous collision detection
+  ---
+  duration_ms: 158.018313
+  type: 'test'
+  ...
+# Subtest: Playing for 60 seconds keeps bodies finite and bounded without stuck launch
+ok 25 - Playing for 60 seconds keeps bodies finite and bounded without stuck launch
+  ---
+  duration_ms: 2091.464426
+  type: 'test'
+  ...
+# Subtest: Single ramp: physical sensor, monotonic travel, collision isolation and tangent handoff
+ok 26 - Single ramp: physical sensor, monotonic travel, collision isolation and tangent handoff
+  ---
+  duration_ms: 136.261238
+  type: 'test'
+  ...
+# Subtest: Ramp restart, new ball and timeout discard guided state
+ok 27 - Ramp restart, new ball and timeout discard guided state
+  ---
+  duration_ms: 177.101246
+  type: 'test'
+  ...
+# Subtest: Ramp has continuous floor, clear width, one endpoint and no descending floor overshoot
+ok 28 - Ramp has continuous floor, clear width, one endpoint and no descending floor overshoot
+  ---
+  duration_ms: 7.000031
+  type: 'test'
+  ...
+# Subtest: Physical guide posts match visible supports and leave the ramp mouth clear
+ok 29 - Physical guide posts match visible supports and leave the ramp mouth clear
+  ---
+  duration_ms: 117.470254
+  type: 'test'
+  ...
+1..29
+# tests 29
+# suites 0
+# pass 29
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 6273.454958

@@ -1,0 +1,17 @@
+{
+  "unchanged": {
+    "layout.json": true,
+    "src/physics.js": true,
+    "src/audio.js": true,
+    "assets/projection.json": true,
+    "vendor/box2d.js": true
+  },
+  "sha256": {
+    "layout.json": "de66ad89e46ad23e4cb449a1863076202b2f2f068fd9d197329b43e54bde5e38",
+    "src/physics.js": "4df82f637dea64e257a35cbe6ae9cba1764b9aa7149da3a6c8c5e8f4065c637d",
+    "src/audio.js": "86c00dc1aa767df8026b288e7b642aa5be5d771ad7628a0edafa0cd6a30168ce",
+    "assets/projection.json": "10d0a73e75b863d9e65b7ec29b9e23ff982005477e0ff35d03b53560ec678922",
+    "vendor/box2d.js": "86d6cec08f1e6df9c113d71c4e3073e1e58166123341cf00400903a19f946597"
+  },
+  "input_handlers_and_game_loop_unchanged": true
+}

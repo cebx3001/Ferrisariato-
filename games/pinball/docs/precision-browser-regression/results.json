@@ -1,0 +1,96 @@
+{
+  "checks": [
+    "Independent keyboard flippers",
+    "Keyboard charge, release, real lane entry",
+    "Real scoring, countdown and running Web Audio",
+    "All seven independent target contacts, scores and transient lights",
+    "All three main bumpers and both secondary tanks rebound",
+    "Both active slingshots",
+    "Pause freezes time and resumes",
+    "Three losses, game over, restart and time limit",
+    "Desktop rendering average frame work < 20 ms",
+    "Mobile simultaneous multi-touch flippers and independent release",
+    "Touch outside the canvas still activates the corresponding screen half",
+    "Mobile independent plunger, real launch and responsive layout"
+  ],
+  "desktop_performance": {
+    "travelState": "RAMP_TRAVEL",
+    "ramp": {
+      "x": 1.4292815373715795,
+      "y": 5.48957651057369,
+      "z": 0.7423083952482512,
+      "tangent": [
+        0.05828333771519929,
+        0.8492500883312137,
+        -0.5247640803391573
+      ],
+      "distance": 24.59046900000007,
+      "progress": 0.9092055248175123
+    },
+    "ballActive": false,
+    "status": "playing",
+    "score": 0,
+    "remaining": 116.74166666666667,
+    "balls": 3,
+    "charge": 0,
+    "launched": true,
+    "entered": false,
+    "position": {
+      "x": 1.4292815373715795,
+      "y": 5.48957651057369
+    },
+    "velocity": {
+      "x": 0,
+      "y": -24.519079117666234
+    },
+    "flippers": [
+      {
+        "id": "left",
+        "angle": 0.42
+      },
+      {
+        "id": "right",
+        "angle": 2.721592653589793
+      }
+    ],
+    "hits": {},
+    "lights": {},
+    "rampLights": [
+      {
+        "sample": 360,
+        "side": -1
+      },
+      {
+        "sample": 360,
+        "side": 1
+      },
+      {
+        "sample": 376,
+        "side": -1
+      },
+      {
+        "sample": 376,
+        "side": 1
+      },
+      {
+        "sample": 392,
+        "side": 1
+      },
+      {
+        "sample": 408,
+        "side": -1
+      },
+      {
+        "sample": 408,
+        "side": 1
+      }
+    ],
+    "ballVisibleFraction": 1,
+    "paused": false,
+    "frames": 631,
+    "averageFrameMs": 1.6110935025802693,
+    "maxFrameMs": 15
+  },
+  "errors": [],
+  "failed_requests": []
+}

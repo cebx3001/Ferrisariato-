@@ -1,0 +1,62 @@
+[
+  {
+    "test": "Physical plunger sensor activates RAMP_TRAVEL and suspends lower collisions",
+    "passed": true
+  },
+  {
+    "test": "Full visible route returns to floor and reaches a scoring bumper",
+    "passed": true,
+    "score": 900
+  },
+  {
+    "test": "Rear arc behind house, rotating ball and sequential light positions share Blender spline",
+    "passed": true,
+    "samples": 481
+  },
+  {
+    "test": "Pause freezes elevated ball, rotation and timer; resume continues same route",
+    "passed": true
+  },
+  {
+    "test": "Restart during travel resets guided state and permits a fresh complete launch",
+    "passed": true
+  },
+  {
+    "test": "Exported static depth keeps ball above bed and occludes it behind physical parts",
+    "passed": true,
+    "visible": 464,
+    "hidden": 17,
+    "total": 481
+  },
+  {
+    "test": "Complete desktop game using only real keyboard input",
+    "passed": true,
+    "launches": 3,
+    "elapsedWallSeconds": 120.51,
+    "score": 8900,
+    "ballsRemaining": 1,
+    "simulationSeconds": 120
+  },
+  {
+    "test": "Canvas work remains under 20 ms average",
+    "passed": true,
+    "averageFrameMs": 1.2882115868337007
+  },
+  {
+    "test": "Mobile touch plunger completes channel and restores scoring physics",
+    "passed": true
+  },
+  {
+    "test": "Complete mobile game using only touch input",
+    "passed": true,
+    "launches": 3,
+    "score": 8850,
+    "ballsRemaining": 0,
+    "simulationSeconds": 27.95833333333239
+  },
+  {
+    "test": "No JavaScript runtime errors",
+    "passed": true,
+    "errors": []
+  }
+]

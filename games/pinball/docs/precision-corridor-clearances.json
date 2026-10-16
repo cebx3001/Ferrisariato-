@@ -1,0 +1,13 @@
+{
+  "rampWidth": 0.7,
+  "ballDiameter": 0.32,
+  "rampSideClearance": 0.18999999999999997,
+  "leftBumperPassage": 0.4950000000000003,
+  "rightBumperPassage": 0.5949999999999998,
+  "exit": [
+    2.65,
+    7.05,
+    0.045
+  ],
+  "exitNearestBumperSurface": 1.1668154702594475
+}

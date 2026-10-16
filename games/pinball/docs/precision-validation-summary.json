@@ -1,0 +1,32 @@
+{
+  "physics": {
+    "passed": 29,
+    "failed": 0,
+    "report": "precision-physics.tap"
+  },
+  "browserRegression": {
+    "passed": 12,
+    "failed": 0,
+    "report": "precision-browser-regression/results.json"
+  },
+  "precisionBrowser": {
+    "passed": 11,
+    "failed": 0,
+    "report": "precision-tests/results.json"
+  },
+  "geometry": {
+    "playfieldDecorationIntrusions": 0,
+    "channelDecorationIntersections": 0
+  },
+  "preserved": [
+    "Official logo pixels",
+    "Box2D vendor engine",
+    "Audio implementation",
+    "Root tracked files"
+  ],
+  "limitations": [
+    "Mobile validation uses Chromium touch emulation, not physical phones",
+    "Global illumination and environment reflections are prerendered",
+    "Visual comparison is supplied; software tests do not certify photographic equivalence"
+  ]
+}

@@ -1,0 +1,562 @@
+[
+  {
+    "travelState": "RAMP_TRAVEL",
+    "ramp": {
+      "x": 9.25,
+      "y": 12.863534558032432,
+      "z": 0.11683244943320661,
+      "tangent": [
+        0,
+        -0.9973729819651966,
+        0.07243710959067547
+      ],
+      "distance": 1.638460777777778,
+      "progress": 0.06058028382266112
+    },
+    "ballActive": false,
+    "status": "playing",
+    "score": 0,
+    "remaining": 118.99166666666667,
+    "balls": 3,
+    "charge": 0,
+    "launched": true,
+    "entered": false,
+    "position": {
+      "x": 9.25,
+      "y": 12.863534558032432
+    },
+    "velocity": {
+      "x": 0,
+      "y": -23.11041359268135
+    },
+    "flippers": [
+      {
+        "id": "left",
+        "angle": 0.42
+      },
+      {
+        "id": "right",
+        "angle": 2.721592653589793
+      }
+    ],
+    "hits": {},
+    "lights": {},
+    "rampLights": [
+      {
+        "sample": 8,
+        "side": -1
+      },
+      {
+        "sample": 8,
+        "side": 1
+      },
+      {
+        "sample": 24,
+        "side": -1
+      },
+      {
+        "sample": 24,
+        "side": 1
+      },
+      {
+        "sample": 40,
+        "side": -1
+      },
+      {
+        "sample": 40,
+        "side": 1
+      }
+    ],
+    "ballVisibleFraction": 1,
+    "paused": false,
+    "frames": 26,
+    "averageFrameMs": 5.999999999426878,
+    "maxFrameMs": 26.700000002980232
+  },
+  {
+    "travelState": "RAMP_TRAVEL",
+    "ramp": {
+      "x": 9.253271914005524,
+      "y": 8.833638209197888,
+      "z": 0.7674815898073187,
+      "tangent": [
+        -0.001685180636572849,
+        -0.9757195885700103,
+        0.21901699625141352
+      ],
+      "distance": 5.72734966666667,
+      "progress": 0.21176244989451232
+    },
+    "ballActive": false,
+    "status": "playing",
+    "score": 0,
+    "remaining": 118.59166666666667,
+    "balls": 3,
+    "charge": 0,
+    "launched": true,
+    "entered": false,
+    "position": {
+      "x": 9.253271914005524,
+      "y": 8.833638209197888
+    },
+    "velocity": {
+      "x": 0,
+      "y": -23.11041359268135
+    },
+    "flippers": [
+      {
+        "id": "left",
+        "angle": 0.42
+      },
+      {
+        "id": "right",
+        "angle": 2.721592653589793
+      }
+    ],
+    "hits": {},
+    "lights": {},
+    "rampLights": [
+      {
+        "sample": 72,
+        "side": -1
+      },
+      {
+        "sample": 72,
+        "side": 1
+      }
+    ],
+    "ballVisibleFraction": 1,
+    "paused": false,
+    "frames": 33,
+    "averageFrameMs": 5.224242423519944,
+    "maxFrameMs": 26.700000002980232
+  },
+  {
+    "travelState": "RAMP_TRAVEL",
+    "ramp": {
+      "x": 8.61829523986467,
+      "y": 2.225860385678801,
+      "z": 1.9464991811422834,
+      "tangent": [
+        -0.4337043864664178,
+        -0.9006768604088153,
+        0.026109352422215074
+      ],
+      "distance": 12.542164481481507,
+      "progress": 0.4637327266809317
+    },
+    "ballActive": false,
+    "status": "playing",
+    "score": 0,
+    "remaining": 117.92500000000001,
+    "balls": 3,
+    "charge": 0,
+    "launched": true,
+    "entered": false,
+    "position": {
+      "x": 8.61829523986467,
+      "y": 2.225860385678801
+    },
+    "velocity": {
+      "x": 0,
+      "y": -23.11041359268135
+    },
+    "flippers": [
+      {
+        "id": "left",
+        "angle": 0.42
+      },
+      {
+        "id": "right",
+        "angle": 2.721592653589793
+      }
+    ],
+    "hits": {},
+    "lights": {},
+    "rampLights": [
+      {
+        "sample": 136,
+        "side": -1
+      },
+      {
+        "sample": 136,
+        "side": 1
+      },
+      {
+        "sample": 152,
+        "side": -1
+      },
+      {
+        "sample": 152,
+        "side": 1
+      },
+      {
+        "sample": 168,
+        "side": -1
+      },
+      {
+        "sample": 168,
+        "side": 1
+      }
+    ],
+    "ballVisibleFraction": 1,
+    "paused": false,
+    "frames": 51,
+    "averageFrameMs": 4.278431371146557,
+    "maxFrameMs": 26.700000002980232
+  },
+  {
+    "travelState": "RAMP_TRAVEL",
+    "ramp": {
+      "x": 4.39384476170708,
+      "y": 0.5100398959253537,
+      "z": 1.95,
+      "tangent": [
+        -0.9996779032057194,
+        0.025378925158805212,
+        0
+      ],
+      "distance": 17.482905222222264,
+      "progress": 0.6464111773510857
+    },
+    "ballActive": false,
+    "status": "playing",
+    "score": 0,
+    "remaining": 117.44166666666668,
+    "balls": 3,
+    "charge": 0,
+    "launched": true,
+    "entered": false,
+    "position": {
+      "x": 4.39384476170708,
+      "y": 0.5100398959253537
+    },
+    "velocity": {
+      "x": 0,
+      "y": -23.11041359268135
+    },
+    "flippers": [
+      {
+        "id": "left",
+        "angle": 0.42
+      },
+      {
+        "id": "right",
+        "angle": 2.721592653589793
+      }
+    ],
+    "hits": {},
+    "lights": {},
+    "rampLights": [
+      {
+        "sample": 232,
+        "side": -1
+      },
+      {
+        "sample": 248,
+        "side": -1
+      },
+      {
+        "sample": 264,
+        "side": -1
+      },
+      {
+        "sample": 264,
+        "side": 1
+      }
+    ],
+    "ballVisibleFraction": 0.19196062346185397,
+    "paused": false,
+    "frames": 64,
+    "averageFrameMs": 3.8328124994877726,
+    "maxFrameMs": 26.700000002980232
+  },
+  {
+    "travelState": "RAMP_TRAVEL",
+    "ramp": {
+      "x": 1.8948684324105611,
+      "y": 1.56413646889166,
+      "z": 1.8833135250397346,
+      "tangent": [
+        -0.48883996353919257,
+        0.8645012825344841,
+        -0.11693170033499523
+      ],
+      "distance": 20.37920151851857,
+      "progress": 0.753498544985314
+    },
+    "ballActive": false,
+    "status": "playing",
+    "score": 0,
+    "remaining": 117.15833333333335,
+    "balls": 3,
+    "charge": 0,
+    "launched": true,
+    "entered": false,
+    "position": {
+      "x": 1.8948684324105611,
+      "y": 1.56413646889166
+    },
+    "velocity": {
+      "x": 0,
+      "y": -23.11041359268135
+    },
+    "flippers": [
+      {
+        "id": "left",
+        "angle": 0.42
+      },
+      {
+        "id": "right",
+        "angle": 2.721592653589793
+      }
+    ],
+    "hits": {},
+    "lights": {},
+    "rampLights": [
+      {
+        "sample": 280,
+        "side": -1
+      },
+      {
+        "sample": 280,
+        "side": 1
+      },
+      {
+        "sample": 296,
+        "side": -1
+      },
+      {
+        "sample": 296,
+        "side": 1
+      },
+      {
+        "sample": 312,
+        "side": -1
+      },
+      {
+        "sample": 312,
+        "side": 1
+      }
+    ],
+    "ballVisibleFraction": 1,
+    "paused": false,
+    "frames": 73,
+    "averageFrameMs": 3.60821917734734,
+    "maxFrameMs": 26.700000002980232
+  },
+  {
+    "travelState": "RAMP_TRAVEL",
+    "ramp": {
+      "x": 1.374048598764653,
+      "y": 4.2953695330459585,
+      "z": 1.2799392402720633,
+      "tangent": [
+        0.05650282999514868,
+        0.9477584343879694,
+        -0.31394486816797085
+      ],
+      "distance": 23.275497814814877,
+      "progress": 0.8605859126195422
+    },
+    "ballActive": false,
+    "status": "playing",
+    "score": 0,
+    "remaining": 116.87500000000001,
+    "balls": 3,
+    "charge": 0,
+    "launched": true,
+    "entered": false,
+    "position": {
+      "x": 1.374048598764653,
+      "y": 4.2953695330459585
+    },
+    "velocity": {
+      "x": 0,
+      "y": -23.11041359268135
+    },
+    "flippers": [
+      {
+        "id": "left",
+        "angle": 0.42
+      },
+      {
+        "id": "right",
+        "angle": 2.721592653589793
+      }
+    ],
+    "hits": {},
+    "lights": {},
+    "rampLights": [
+      {
+        "sample": 328,
+        "side": -1
+      },
+      {
+        "sample": 328,
+        "side": 1
+      },
+      {
+        "sample": 344,
+        "side": -1
+      },
+      {
+        "sample": 344,
+        "side": 1
+      },
+      {
+        "sample": 360,
+        "side": -1
+      },
+      {
+        "sample": 360,
+        "side": 1
+      }
+    ],
+    "ballVisibleFraction": 1,
+    "paused": false,
+    "frames": 83,
+    "averageFrameMs": 3.3530120476182685,
+    "maxFrameMs": 26.700000002980232
+  },
+  {
+    "travelState": "RAMP_TRAVEL",
+    "ramp": {
+      "x": 1.657286479070507,
+      "y": 6.558976756374303,
+      "z": 0.18522885951935564,
+      "tangent": [
+        0.45094033468790656,
+        0.8308583566770525,
+        -0.32607852687882827
+      ],
+      "distance": 25.83105337037044,
+      "progress": 0.9550747664144494
+    },
+    "ballActive": false,
+    "status": "playing",
+    "score": 0,
+    "remaining": 116.62500000000001,
+    "balls": 3,
+    "charge": 0,
+    "launched": true,
+    "entered": false,
+    "position": {
+      "x": 1.657286479070507,
+      "y": 6.558976756374303
+    },
+    "velocity": {
+      "x": 0,
+      "y": -23.11041359268135
+    },
+    "flippers": [
+      {
+        "id": "left",
+        "angle": 0.42
+      },
+      {
+        "id": "right",
+        "angle": 2.721592653589793
+      }
+    ],
+    "hits": {},
+    "lights": {},
+    "rampLights": [
+      {
+        "sample": 376,
+        "side": -1
+      },
+      {
+        "sample": 376,
+        "side": 1
+      },
+      {
+        "sample": 392,
+        "side": 1
+      },
+      {
+        "sample": 408,
+        "side": -1
+      },
+      {
+        "sample": 408,
+        "side": 1
+      },
+      {
+        "sample": 424,
+        "side": -1
+      },
+      {
+        "sample": 424,
+        "side": 1
+      },
+      {
+        "sample": 440,
+        "side": -1
+      },
+      {
+        "sample": 440,
+        "side": 1
+      },
+      {
+        "sample": 456,
+        "side": -1
+      },
+      {
+        "sample": 456,
+        "side": 1
+      },
+      {
+        "sample": 472,
+        "side": -1
+      },
+      {
+        "sample": 472,
+        "side": 1
+      }
+    ],
+    "ballVisibleFraction": 0.9327317473338802,
+    "paused": false,
+    "frames": 88,
+    "averageFrameMs": 3.298863635821776,
+    "maxFrameMs": 26.700000002980232
+  },
+  {
+    "travelState": "PLAYFIELD",
+    "ramp": null,
+    "ballActive": true,
+    "status": "playing",
+    "score": 0,
+    "remaining": 116.47500000000001,
+    "balls": 3,
+    "charge": 0,
+    "launched": true,
+    "entered": true,
+    "position": {
+      "x": 2.8487767957061756,
+      "y": 7.074432082616536
+    },
+    "velocity": {
+      "x": 7.948090921584667,
+      "y": 1.0518981685404916
+    },
+    "flippers": [
+      {
+        "id": "left",
+        "angle": 0.42
+      },
+      {
+        "id": "right",
+        "angle": 2.721592653589793
+      }
+    ],
+    "hits": {},
+    "lights": {},
+    "rampLights": [],
+    "ballVisibleFraction": 1,
+    "paused": false,
+    "frames": 92,
+    "averageFrameMs": 3.234782608144957,
+    "maxFrameMs": 26.700000002980232
+  }
+]

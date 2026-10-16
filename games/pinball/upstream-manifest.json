@@ -1,0 +1,17 @@
+{
+  "repository": "https://github.com/lrusso/Pinball",
+  "commit": "fcf63f97d24467248fe1eaa89adaf273209f3da2",
+  "sha256": {
+    "worker.js": "919d302592a2e7072dce72c71273ad7a0f3f103f7e94445e21af9bfdf896ceba",
+    "README.md": "0917c79bf5661f146903acf779342c340261eaf24b4225accb44c7e9f0a6094b",
+    "PinballShare.png": "97a47750331d927b0d548ed1fbfd32fe2dbd753b73015a8b1f52df647a0a6199",
+    "PinballGame.js": "d2ddea5b930a1ee63ffd436b95ddc570583230904b9f75eef38be752676335e8",
+    "PinballGame.htm": "f761159f85a451d8620aad2e953d430a97a94715f90c003ce00b8864558fe34d",
+    "PinballFavIcon_512x512.png": "03d735e4f100f1fceab7cff77b788ead9b2117f88bfe5779dd45ef59149369d7",
+    "PinballFavIcon_192x192.png": "b7afa3cf7b8651f7747f5233f81641c665737dae2e1b9a61f74b9b80b9b4e96a",
+    "PinballFavIcon_16x16.png": "b72f11d57e73914929b0e47e0d0873be972023a10c7ceebe9825d12cb536705c",
+    "Pinball.png": "afd9bcb72fb7fd81d6e3dfbcb5a47fde7f5e21e8d224cb5e3ea27e4e5524f4b5",
+    "Pinball.json": "6bc70d6b15a39c68e3fa96d7a1abd3017e1938877be0793181fdde7fc6aacf24",
+    "Pinball.htm": "05f29c0d0ee249e087221ec866ca62b814575d2c7c48e2cb196594757f6fb1de"
+  }
+}
