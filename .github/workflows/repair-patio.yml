@@ -1,0 +1,45 @@
+name: Repair Patio Set preview and geometry
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/repair-patio.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  repair:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Blender 5.2
+        run: |
+          curl --fail --location --retry 3 --output /tmp/blender.tar.xz https://download.blender.org/release/Blender5.2/blender-5.2.2-linux-x64.tar.xz
+          mkdir -p /tmp/blender
+          tar -xf /tmp/blender.tar.xz -C /tmp/blender --strip-components=1
+      - name: Remove accidental default cube from Patio and regenerate textured preview
+        run: |
+          /tmp/blender/blender --background --factory-startup --threads 2 --python-exit-code 7 \
+            --python .github/scripts/convert_blends.py -- \
+            home/assets/models/patio-set.glb home/assets/models/patio-set.glb \
+            home/assets/img/patio.png patio /tmp/patio-dimensions.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          dims=json.loads(Path('/tmp/patio-dimensions.json').read_text())['dimensions']
+          print('FIXED_DIMENSIONS',dims)
+          assert .6 < dims[1] < 1.5, 'Patio set still includes extraneous cube'
+          p=Path('home/js/products.js');products=json.loads(p.read_text().split('=',1)[1].rstrip(' ;\n'))
+          for x in products:
+              if x['id']=='patio':x['dimensions']=dims
+          p.write_text('export const PRODUCTS='+json.dumps(products,indent=2,ensure_ascii=False)+';\n')
+          PY
+      - name: Publish corrected Patio Set
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add home/assets/models/patio-set.glb home/assets/img/patio.png home/js/products.js
+          if ! git diff --staged --quiet; then
+            git commit -m 'Fix textured Patio Set ground dimensions and remove starter cube'
+            git push
+          fi

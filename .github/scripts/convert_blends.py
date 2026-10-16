@@ -8,7 +8,17 @@ args=sys.argv[sys.argv.index('--')+1:]
 source, target, thumbnail, key, report_path=args
 print('ASSET_START',key,source,flush=True)
 if source.lower().endswith('.glb'):
+ # Clear Blender startup cube before import; otherwise it becomes part of the product.
+ bpy.ops.object.select_all(action='SELECT')
+ bpy.ops.object.delete(use_global=False)
  bpy.ops.import_scene.gltf(filepath=str(Path(source).resolve()))
+ if key=='patio':
+  for ob in list(bpy.data.objects):
+   if ob.type!='MESH':continue
+   size=[max(p[i] for p in [ob.matrix_world @ Vector(x) for x in ob.bound_box]) - min(p[i] for p in [ob.matrix_world @ Vector(x) for x in ob.bound_box]) for i in range(3)]
+   if ob.name.startswith('Cube') and len(ob.data.polygons)<=12 and all(abs(v-2.0)<0.01 for v in size):
+    print('REMOVE_ACCIDENTAL_STARTUP_CUBE',ob.name,flush=True)
+    bpy.data.objects.remove(ob,do_unlink=True)
 else:
  bpy.ops.wm.open_mainfile(filepath=str(Path(source).resolve()),load_ui=False)
 meshes=[o for o in bpy.data.objects if o.type=='MESH' and len(o.data.vertices)>0]
