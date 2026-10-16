@@ -54,13 +54,13 @@ for item in metadata:
  key=item['id']
  if key not in reports:continue
  item.update(thumb=f'./assets/img/{key}.png' if (imgs/(key+'.png')).exists() else './assets/img/terraza-referencia.jpg',
-             local=f'./assets/models/{key}.glb',pack=None,remote=None,modelReady=True,
+             local=f'./assets/models/{"patio-set" if key=="patio" else key}.glb',pack=None,remote=None,modelReady=True,
              dimensions=reports[key]['dimensions'],source='Modelo original enviado por el usuario')
  products.append(item)
 assert products and any(x['id']=='patio' for x in products)
 (ROOT/'home/js/products.js').write_text('export const PRODUCTS='+json.dumps(products,ensure_ascii=False,indent=2)+';\n')
 # Remove the outdated assets (including old packed copies) only after new ones exist.
-keep={item['id']+'.glb' for item in products}
+keep={(('patio-set' if item['id']=='patio' else item['id'])+'.glb') for item in products}
 for f in models.rglob('*'):
  if f.is_file() and f.relative_to(models).as_posix() not in keep:f.unlink()
 for d in sorted(models.rglob('*'),key=lambda p:len(p.parts),reverse=True):

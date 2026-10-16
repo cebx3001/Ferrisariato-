@@ -1,4 +1,5 @@
 name: Publish replacement HOME 3D models
+# Updated validation of Patio Set file name
 on:
   push:
     branches: [main]
