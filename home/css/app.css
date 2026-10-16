@@ -100,3 +100,14 @@
 
 /* Show live GLB/AR canvas for imported models; photos only for pending items. */
 .viewer:not(.is-concept) .concept-preview{display:none!important}
+
+/* CLIENT MOCKUP: clean blue product stage, circular vignette. */
+.viewer{background:#07538d!important}
+.staging-bg{display:none!important;background:none!important}
+.viewer::after{background:radial-gradient(ellipse at 50% 48%,transparent 32%,rgba(0,23,52,.16) 62%,rgba(0,13,36,.66) 100%)!important}
+.concept-preview{background:#07538d!important}
+.concept-preview>img{background:#07538d!important;object-fit:contain}
+.concept-preview:after{background:radial-gradient(ellipse at 50% 43%,transparent 25%,rgba(0,18,46,.13) 65%,rgba(0,13,34,.75) 100%)!important}
+.shell.ar-active .viewer{background:transparent!important}
+.shell.ar-active .viewer::after{background:none!important}
+@media(max-width:760px){.viewer .gesture-hint{font-size:13px;background:#042d50bb;padding:6px 12px;left:7%;right:7%;border:1px solid #ffffff40}}
