@@ -1,0 +1,51 @@
+name: Publish replacement HOME 3D models
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'home/assets/new-packed/**'
+      - '.github/workflows/publish-new-home.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Install Zstandard and Blender 5.2
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y zstd libgl1 libx11-6 libxi6 libxxf86vm1
+          curl --fail --location --retry 3 --output /tmp/blender.tar.xz https://download.blender.org/release/Blender5.2/blender-5.2.2-linux-x64.tar.xz
+          mkdir -p /tmp/blender
+          tar -xf /tmp/blender.tar.xz -C /tmp/blender --strip-components=1
+          /tmp/blender/blender --version | head -1
+      - name: Convert all original customer models, including materials
+        env:
+          BLENDER_BINARY: /tmp/blender/blender
+        run: python3 .github/scripts/build_home_assets.py
+      - name: Validate published GLBs and replace catalogue
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          r=Path('home/assets/models'); p=Path('home/js/products.js').read_text()
+          for x in r.glob('*.glb'):
+              assert x.read_bytes()[:4]==b'glTF',x
+              assert x.stat().st_size>2048,x
+              print('READY',x,x.stat().st_size)
+          assert 'patio-set.glb' in p
+          PY
+      - name: Publish updated site to main
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A home/assets/models home/assets/img home/assets/new-packed home/js/products.js home/js/scene.js home/js/packed-models.js
+          if ! git diff --staged --quiet; then
+            git commit -m 'Replace HOME catalogue with supplied textured 3D models'
+            git push
+          fi
