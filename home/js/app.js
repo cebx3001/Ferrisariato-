@@ -19,7 +19,11 @@ function updateConcept(){
  }else{
   $('mode-label').textContent='MODELO 3D ORIGINAL';
   hint('DESLIZA PARA GIRAR · PELLIZCA PARA CAMBIAR TAMAÑO');
+  $('active-product-title').textContent=selected.name;
+  $('active-product-desc').textContent=selected.description;
+  $('active-product-gesture').textContent='1 DEDO: GIRAR · PELLIZCA: CAMBIAR TAMAÑO';
  }
+ $('active-product-copy').hidden=!selected.modelReady;
  $('mode-ar').innerHTML=selected.modelReady?'VER EN AR <span>↗</span>':'AR PRÓXIMAMENTE <span>↗</span>';
 }
 
@@ -40,7 +44,7 @@ function init(){renderProducts();$('products').addEventListener('click',e=>{let 
  $('fav').addEventListener('click',()=>{saved.has(selected.id)?saved.delete(selected.id):saved.add(selected.id);persistSaved();updateSaved();setMessage(saved.has(selected.id)?'Producto guardado en este dispositivo.':'Producto quitado de guardados.');});
  $('saved-btn').addEventListener('click',()=>{if(!saved.size){setMessage('No hay productos guardados. Usa el corazón de cada producto.');return;}let item=PRODUCTS.find(p=>saved.has(p.id));if(item)select(item);setMessage('Se ha abierto el primer producto guardado.');});
  $('mode-ar').addEventListener('click',()=>setMode('ar'));$('mode-studio').addEventListener('click',()=>setMode('studio'));
- $('place-btn').addEventListener('click',()=>{if(!selected.modelReady){window.open(selected.thumb,'_blank','noopener,noreferrer');return;}if(!viewer){setMessage('Espera a que esté disponible el visor 3D.',true);return;}if(!viewer.item){select(selected);return;}if(viewer.hasPlaced){viewer.resetPlacement();$('place-btn').innerHTML=mode==='ar'?'COLOCAR EN TU ESPACIO <b>↗</b>':'COLOCAR EN ESCENA <b>↗</b>';return;}if(viewer.place()){modelPlaced=true;moving=false;$('move-btn').classList.remove('active');$('place-btn').innerHTML=mode==='ar'?'CAMBIAR POSICIÓN <b>↗</b>':'COLOCADO · MOVER <b>↗</b>';hint('1 DEDO: GIRAR · 2 DEDOS: ESCALAR');setMessage('Producto colocado. Arrastra para moverlo; usa dos dedos para girar o cambiar tamaño.');}else{setMessage('Apunta con la cámara al suelo hasta que aparezca el indicador.',true);}});
+ $('place-btn').addEventListener('click',()=>{if(!selected.modelReady){window.open(selected.thumb,'_blank','noopener,noreferrer');return;}if(!viewer){setMessage('Espera a que esté disponible el visor 3D.',true);return;}if(!viewer.item){select(selected);return;}if(viewer.hasPlaced){viewer.resetPlacement();$('place-btn').innerHTML=mode==='ar'?'COLOCAR EN TU ESPACIO <b>↗</b>':'COLOCAR EN ESCENA <b>↗</b>';return;}if(viewer.place()){modelPlaced=true;moving=false;$('move-btn').classList.remove('active');$('place-btn').innerHTML=mode==='ar'?'CAMBIAR POSICIÓN <b>↗</b>':'COLOCADO · MOVER <b>↗</b>';hint('1 DEDO: GIRAR · PELLIZCA: CAMBIAR TAMAÑO');$('active-product-gesture').textContent='DESLIZA: GIRAR · PELLIZCA: ESCALA · CAMBIAR POSICIÓN: REUBICAR';setMessage('Desliza con un dedo para girar el mueble. Pellizca con dos dedos para ajustar su tamaño. Para trasladarlo, pulsa CAMBIAR POSICIÓN.');}else{setMessage('Apunta con la cámara al suelo hasta que aparezca el indicador.',true);}});
  $('move-btn').addEventListener('click',()=>{if(!viewer)return;if(mode==='ar'){viewer.resetPlacement();modelPlaced=false;$('place-btn').innerHTML='COLOCAR EN TU ESPACIO <b>↗</b>';setMessage('Busca otra zona del suelo y pulsa COLOCAR.');return;}moving=!moving;viewer.moving=moving;$('move-btn').classList.toggle('active',moving);setMessage(moving?'Arrastra sobre la escena para desplazar el producto.':'Arrastra sobre la escena para girar la cámara.');});
  function setRotation(n){rotation=Math.max(-180,Math.min(180,n));$('rot').value=rotation;$('rot-val').textContent=rotation+'°';viewer?.setRotation(rotation);}
  $('rotate-left').addEventListener('click',()=>setRotation(Math.max(-180,rotation-15)));$('rotate-right').addEventListener('click',()=>setRotation(Math.min(180,rotation+15)));$('rot').addEventListener('input',e=>setRotation(+e.target.value));

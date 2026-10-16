@@ -111,3 +111,24 @@
 .shell.ar-active .viewer{background:transparent!important}
 .shell.ar-active .viewer::after{background:none!important}
 @media(max-width:760px){.viewer .gesture-hint{font-size:13px;background:#042d50bb;padding:6px 12px;left:7%;right:7%;border:1px solid #ffffff40}}
+
+/* HOME DEMO final layout: Ferrisariato blue product stage, round vignette and readable copy */
+.viewer{background:#0055A5!important}
+.staging-bg{display:none!important}
+.viewer::after{background:radial-gradient(circle at center,transparent 30%,rgba(0,30,73,.12) 60%,rgba(0,16,40,.68) 100%)!important;pointer-events:none}
+.active-product-copy{position:absolute;z-index:5;bottom:180px;left:clamp(16px,3vw,42px);max-width:min(590px,72%);pointer-events:none;text-shadow:0 2px 8px rgba(0,0,0,.8);background:linear-gradient(90deg,rgba(0,30,65,.75),rgba(0,30,65,.10));padding:12px 18px 12px 15px;border-left:3px solid #ffd500}
+.active-product-copy[hidden]{display:none!important}
+.active-product-kicker{display:block;color:#ffdb23;font:700 11px/1.2 var(--display);letter-spacing:.12em}
+.active-product-copy strong{display:block;font:900 32px/1.05 var(--display);margin:5px 0}
+.active-product-copy p{font:500 14px/1.35 var(--display);color:#fff;max-width:51ch;margin:4px 0 8px}
+.active-product-gesture{display:block;color:#ffdc22;font:800 12px/1.35 var(--display);letter-spacing:.045em}
+@media(max-width:760px){
+ .active-product-copy{z-index:5;left:12px;right:12px;max-width:none;bottom:calc(157px + env(safe-area-inset-bottom));padding:9px 12px 9px 12px;border-left-width:2px;background:linear-gradient(90deg,rgba(0,29,58,.81),rgba(0,29,58,.47))}
+ .active-product-kicker{font-size:9px}
+ .active-product-copy strong{font-size:20px;margin:3px 0}
+ .active-product-copy p{font-size:11px;line-height:1.35;max-height:2.8em;overflow:hidden;margin:2px 0 5px}
+ .active-product-gesture{font-size:10px}
+ .shell.ar-active .active-product-copy{bottom:calc(159px + env(safe-area-inset-bottom))}
+ .gesture-hint{display:none!important}
+ .shell.ar-active .viewer::after{background:none!important}
+}

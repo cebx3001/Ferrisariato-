@@ -1,4 +1,4 @@
-export const PRODUCTS=[
+export const PRODUCTS = [
   {
     "id": "patio",
     "name": "JUEGO DE PATIO",
@@ -24,18 +24,14 @@ export const PRODUCTS=[
     "category": "EXTERIORES",
     "short": "Sombrilla para patio y jardín",
     "description": "Una amplia sombrilla que aporta sombra y comodidad a terrazas y jardines. Ideal para crear una zona fresca de descanso.",
-    "thumb": "https://images.unsplash.com/photo-1533090161767-e6ffed986c88?w=520&q=85",
-    "local": "./assets/models/umbrella.glb",
+    "thumb": "https://images.unsplash.com/photo-1777052854737-7893f50de539?auto=format&fit=crop&w=720&q=84",
+    "local": null,
     "pack": null,
     "remote": null,
     "modelReady": false,
-    "dimensions": [
-      2.8,
-      0.0536,
-      2.8
-    ],
+    "dimensions": null,
     "source": "Modelo original enviado por el usuario",
-    "previewThumb": "./assets/img/patio.jpg"
+    "previewThumb": "https://images.unsplash.com/photo-1777052854737-7893f50de539?auto=format&fit=crop&w=720&q=84"
   },
   {
     "id": "chair",
@@ -44,17 +40,13 @@ export const PRODUCTS=[
     "short": "Silla de diseño",
     "description": "Silla de exterior de líneas contemporáneas, diseñada para acompañar mesas y espacios de reunión en patios y terrazas.",
     "thumb": "https://images.unsplash.com/photo-1503602642458-232111445657?w=520&q=85",
-    "local": "./assets/models/chair.glb",
+    "local": null,
     "pack": null,
     "remote": null,
     "modelReady": false,
-    "dimensions": [
-      0.85,
-      1.1924,
-      0.8298
-    ],
+    "dimensions": null,
     "source": "Modelo original enviado por el usuario",
-    "previewThumb": "./assets/img/patio.jpg"
+    "previewThumb": "https://images.unsplash.com/photo-1503602642458-232111445657?w=520&q=85"
   },
   {
     "id": "format1",
@@ -63,17 +55,13 @@ export const PRODUCTS=[
     "short": "Modelo tridimensional original",
     "description": "Un sofá de exterior pensado para crear una zona acogedora donde conversar, descansar y compartir al aire libre.",
     "thumb": "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=520&q=85",
-    "local": "./assets/models/format1.glb",
+    "local": null,
     "pack": null,
     "remote": null,
     "modelReady": false,
-    "dimensions": [
-      2,
-      1.4872,
-      1.9994
-    ],
+    "dimensions": null,
     "source": "Modelo original enviado por el usuario",
-    "previewThumb": "./assets/img/patio.jpg"
+    "previewThumb": "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=520&q=85"
   },
   {
     "id": "poltrona",
@@ -82,16 +70,12 @@ export const PRODUCTS=[
     "short": "Sillón de diseño",
     "description": "Sillón de diseño con una presencia elegante y acogedora. Una pieza para zonas de lectura, descanso y conversación.",
     "thumb": "https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=520&q=85",
-    "local": "./assets/models/poltrona.glb",
+    "local": null,
     "pack": null,
     "remote": null,
     "modelReady": false,
-    "dimensions": [
-      1.05,
-      0.496,
-      1.05
-    ],
+    "dimensions": null,
     "source": "Modelo original enviado por el usuario",
-    "previewThumb": "./assets/img/patio.jpg"
+    "previewThumb": "https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=520&q=85"
   }
 ];

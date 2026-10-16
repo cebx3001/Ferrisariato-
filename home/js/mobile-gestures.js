@@ -1,44 +1,79 @@
 /**
- * HOME mobile gestures: one finger moves a placed model along the tracked ground;
- * two fingers rotate and pinch-scale. Studio keeps one-finger orbit and adds pinch zoom.
+ * HOME touch interactions. One finger rotates the placed model in AR.
+ * Pinch scales 50–150%, twist rotates; two-finger drag repositions on the plane.
+ * In studio, one finger rotates the product and vertically orbits the viewpoint.
+ * The PlayCanvas renderer remains interactive without extra HUD buttons.
  */
-const clamp=(n,a,b)=>Math.min(b,Math.max(a,n));
-const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
+const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
+const distance=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
 const angle=(a,b)=>Math.atan2(b.y-a.y,b.x-a.x);
-const dAngle=(a,b)=>Math.atan2(Math.sin(a-b),Math.cos(a-b));
+const angleDelta=(a,b)=>Math.atan2(Math.sin(a-b),Math.cos(a-b));
+const center=(a,b)=>({x:(a.x+b.x)/2,y:(a.y+b.y)/2});
 export function attachMobileGestures(viewer,layer,{onTransform=()=>{}}={}){
- const points=new Map();let pinch=null,last=null,studio=null;
- const pair=()=>[...points.values()].slice(0,2);
- const initPinch=()=>{if(points.size<2)return;const [a,b]=pair();pinch={distance:Math.max(10,dist(a,b)),angle:angle(a,b),yaw:viewer.yaw,scale:viewer.scale};studio={distance:pinch.distance,zoom:viewer.distance};last=null;};
- const onDown=e=>{if(e.pointerType==='mouse'&&e.button!==0)return;e.preventDefault();points.set(e.pointerId,{x:e.clientX,y:e.clientY});try{layer.setPointerCapture(e.pointerId);}catch{}if(points.size>=2)initPinch();else last={x:e.clientX,y:e.clientY};};
- const onMove=e=>{
-  if(!points.has(e.pointerId))return;e.preventDefault();
-  const p={x:e.clientX,y:e.clientY};points.set(e.pointerId,p);
-  if(!viewer.session||!viewer.hasPlaced||!viewer.rootModel||!viewer.item)return;
-  if(points.size>=2){if(!pinch)initPinch();const [a,b]=pair();
-   viewer.setScale(clamp(pinch.scale*dist(a,b)/pinch.distance,.5,1.5));
-   viewer.setRotation(pinch.yaw+dAngle(angle(a,b),pinch.angle)*180/Math.PI);
-   onTransform({rotation:viewer.yaw,scale:viewer.scale});return;}
-  if(!last){last=p;return;}
-  const dx=p.x-last.x,dy=p.y-last.y;last=p;
-  const camera=viewer.camera,pos=viewer.productRoot.getPosition().clone();
-  const distance=Math.max(.4,pos.distance(camera.getPosition()));
-  const factor=2*distance*Math.tan((camera.camera.fov||60)*Math.PI/360)/Math.max(1,viewer.canvas.clientHeight);
-  const right=camera.right,fwd=camera.forward;
-  const norm=Math.hypot(fwd.x,fwd.z)||1;
-  viewer.productRoot.setPosition(pos.x+right.x*dx*factor+fwd.x/norm*dy*factor,pos.y,pos.z+right.z*dx*factor+fwd.z/norm*dy*factor);
- };
- const onUp=e=>{points.delete(e.pointerId);if(points.size>=2)initPinch();else{pinch=null;last=points.size?pair()[0]:null;}};
- layer.addEventListener('pointerdown',onDown,{passive:false});
- layer.addEventListener('pointermove',onMove,{passive:false});
- for(const event of ['pointerup','pointercancel','lostpointercapture'])layer.addEventListener(event,onUp);
+ const arTouches=new Map(),studioTouches=new Map();
+ let arOne=null,arTwo=null,studioTwo=null;
+ const getTwo=map=>[...map.values()].slice(0,2);
+ const update=()=>onTransform({rotation:viewer.yaw,scale:viewer.scale});
+ function onARStart(e){
+  if(e.pointerType==='mouse'&&e.button!==0)return;
+  e.preventDefault();
+  arTouches.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  try{layer.setPointerCapture(e.pointerId);}catch{}
+  if(arTouches.size===1)arOne={x:e.clientX,y:e.clientY};
+  if(arTouches.size===2){
+   const [a,b]=getTwo(arTouches);arTwo={distance:Math.max(10,distance(a,b)),angle:angle(a,b),center:center(a,b),yaw:viewer.yaw,scale:viewer.scale,position:viewer.productRoot.getPosition().clone()};arOne=null;
+  }
+ }
+ function onARMove(e){
+  if(!arTouches.has(e.pointerId))return;e.preventDefault();
+  const pt={x:e.clientX,y:e.clientY};arTouches.set(e.pointerId,pt);
+  if(!viewer.session||!viewer.hasPlaced||!viewer.rootModel)return;
+  if(arTouches.size>=2){
+   if(!arTwo)return;
+   const [a,b]=getTwo(arTouches),c=center(a,b);
+   viewer.setScale(clamp(arTwo.scale*distance(a,b)/arTwo.distance,.5,1.5));
+   viewer.setRotation(arTwo.yaw+angleDelta(angle(a,b),arTwo.angle)*180/Math.PI);
+   const cam=viewer.camera,base=arTwo.position,fwd=cam.forward,right=cam.right;
+   const d=Math.max(.4,base.distance(cam.getPosition()));
+   const meter=2*d*Math.tan((cam.camera.fov||60)*Math.PI/360)/Math.max(1,viewer.canvas.clientHeight);
+   const norm=Math.hypot(fwd.x,fwd.z)||1;
+   const dx=c.x-arTwo.center.x,dy=c.y-arTwo.center.y;
+   viewer.productRoot.setPosition(base.x+right.x*dx*meter+(fwd.x/norm)*dy*meter,base.y,base.z+right.z*dx*meter+(fwd.z/norm)*dy*meter);
+   update();return;
+  }
+  if(!arOne){arOne=pt;return;}
+  viewer.rotate((pt.x-arOne.x)*.55);arOne=pt;update();
+ }
+ function onARStop(e){
+  arTouches.delete(e.pointerId);
+  if(arTouches.size>=2){const [a,b]=getTwo(arTouches);arTwo={distance:Math.max(10,distance(a,b)),angle:angle(a,b),center:center(a,b),yaw:viewer.yaw,scale:viewer.scale,position:viewer.productRoot.getPosition().clone()};}
+  else{arTwo=null;arOne=arTouches.size?[...arTouches.values()][0]:null;}
+ }
+ layer.addEventListener('pointerdown',onARStart,{passive:false});
+ layer.addEventListener('pointermove',onARMove,{passive:false});
+ for(const k of ['pointerup','pointercancel','lostpointercapture'])layer.addEventListener(k,onARStop);
  const canvas=viewer.canvas;
- const studioDown=e=>{if(viewer.session)return;points.set(e.pointerId,{x:e.clientX,y:e.clientY});if(points.size>=2)initPinch();};
- const studioMove=e=>{if(viewer.session||!points.has(e.pointerId))return;points.set(e.pointerId,{x:e.clientX,y:e.clientY});
-  if(points.size<2)return;e.preventDefault();e.stopImmediatePropagation();if(!studio)initPinch();
-  const [a,b]=pair();viewer.distance=clamp(studio.zoom*studio.distance/Math.max(10,dist(a,b)),2,12);viewer._cameraLook();};
- const studioUp=e=>{points.delete(e.pointerId);if(points.size>=2)initPinch();else studio=null;};
- canvas.addEventListener('pointerdown',studioDown,true);
- canvas.addEventListener('pointermove',studioMove,{capture:true,passive:false});
- for(const event of ['pointerup','pointercancel','lostpointercapture'])canvas.addEventListener(event,studioUp,true);
+ const captureDown=e=>{
+  if(viewer.session)return;
+  studioTouches.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(studioTouches.size>=2){
+   const [a,b]=getTwo(studioTouches);studioTwo={distance:Math.max(10,distance(a,b)),scale:viewer.scale};
+  }
+ };
+ const captureMove=e=>{
+  if(viewer.session||!studioTouches.has(e.pointerId))return;
+  studioTouches.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(studioTouches.size<2)return;
+  e.preventDefault();e.stopImmediatePropagation();
+  if(!studioTwo)return;
+  const [a,b]=getTwo(studioTouches);
+  viewer.setScale(clamp(studioTwo.scale*distance(a,b)/studioTwo.distance,.5,1.5));update();
+ };
+ const captureStop=e=>{
+  studioTouches.delete(e.pointerId);
+  if(studioTouches.size>=2){const [a,b]=getTwo(studioTouches);studioTwo={distance:Math.max(10,distance(a,b)),scale:viewer.scale};}else studioTwo=null;
+ };
+ canvas.addEventListener('pointerdown',captureDown,true);
+ canvas.addEventListener('pointermove',captureMove,{capture:true,passive:false});
+ for(const k of ['pointerup','pointercancel','lostpointercapture'])canvas.addEventListener(k,captureStop,true);
 }
