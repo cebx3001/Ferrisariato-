@@ -1,0 +1,67 @@
+name: Build new Ferrisariato HOME models
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'home/assets/source/packed/**'
+      - '.github/workflows/build-new-home-catalog.yml'
+      - 'scripts/export_home_blends.py'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build-home:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install decompressor
+        run: python -m pip install -q zstandard
+      - name: Reconstruct supplied sources and texturized Patio Set
+        shell: bash
+        run: |
+          python - <<'PY'
+          import base64
+          from pathlib import Path
+          import zstandard as zstd
+          root=Path('home/assets/source/packed')
+          d=Path('/tmp/ferri-home-blend')
+          d.mkdir(parents=True,exist_ok=True)
+          for name in ('umbrella','chair','format1','poltrona','patio'):
+              parts=sorted(root.glob(name+'.*.b64'))
+              assert parts, 'Missing '+name
+              raw=base64.b64decode(''.join(x.read_text().strip() for x in parts))
+              decoded=zstd.ZstdDecompressor().decompress(raw)
+              dest=Path('home/assets/models/new/patio.glb') if name=='patio' else d/(name+'.blend')
+              dest.parent.mkdir(parents=True,exist_ok=True)
+              dest.write_bytes(decoded)
+              assert (decoded.startswith(b'glTF') if name=='patio' else decoded.startswith(b'BLENDER')), (name,decoded[:10])
+              print(name,'=>',dest,len(decoded),'bytes',flush=True)
+          PY
+      - name: Publish textured Patio Set immediately
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add home/assets/models/new/patio.glb
+          if ! git diff --staged --quiet; then
+            git commit -m "Publish new Patio Set GLB with PBR textures"
+            git push
+          fi
+      - name: Install Blender 4.2 Python
+        run: python -m pip install -q bpy==4.2.0
+      - name: Convert four new Blender models preserving available materials
+        run: python scripts/export_home_blends.py
+      - name: Publish four new GLBs
+        shell: bash
+        run: |
+          git add home/assets/models/new/umbrella.glb home/assets/models/new/chair.glb home/assets/models/new/format1.glb home/assets/models/new/poltrona.glb home/assets/models/new/report.json
+          if ! git diff --staged --quiet; then
+            git commit -m "Publish four original Blender HOME models as GLBs"
+            git push
+          fi
