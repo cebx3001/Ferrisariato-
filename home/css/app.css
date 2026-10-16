@@ -97,3 +97,6 @@
 /* Use real GLB viewer for five supplied assets; keep static photography only for model-pending items. */
 #viewer:not(.is-concept) .concept-preview{display:none!important}
 #viewer:not(.is-concept) #render-canvas{visibility:visible;pointer-events:auto}
+
+/* Show live GLB/AR canvas for imported models; photos only for pending items. */
+.viewer:not(.is-concept) .concept-preview{display:none!important}
