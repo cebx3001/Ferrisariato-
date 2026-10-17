@@ -1,7 +1,7 @@
-import {PinballPhysics} from './physics.js?v=reference-5.6';
-import {Renderer} from './renderer.js?v=reference-5.6';
+import {PinballPhysics} from './physics.js?v=reference-5.7';
+import {Renderer} from './renderer.js?v=reference-5.7';
 import {PinballAudio} from './audio.js';
-const BUILD='reference-5.6';
+const BUILD='reference-5.7';
 const $=id=>document.getElementById(id),audio=new PinballAudio();
 const image=src=>new Promise((resolve,reject)=>{const i=new Image();i.onload=()=>resolve(i);i.onerror=()=>reject(Error('No se pudo cargar '+src));i.src=src+'?v='+BUILD;});
 const json=async url=>{const r=await fetch(url+'?v='+BUILD);if(!r.ok)throw Error('No se pudo cargar '+url);return r.json();};
@@ -75,6 +75,7 @@ try {
     if(!paused){accumulator+=dt;while(accumulator>=1/120){game.tick(1/120);accumulator-=1/120;}}
     for(const event of game.events.splice(0)){
       if(event.type==='hit')audio.play(event.kind,event.id);
+      if(event.type==='bonus-note')audio.bonusStep(event.index);
       if(event.type==='launch')audio.play('launch');
       if(event.type==='unstuck')audio.play('sling');
       if(event.type==='finish'){
@@ -86,7 +87,7 @@ try {
     const seconds=Math.ceil(game.remaining);$('time').textContent=String(Math.floor(seconds/60)).padStart(2,'0')+':'+String(seconds%60).padStart(2,'0');
     $('balls').textContent='● '.repeat(Math.max(0,game.balls)).trim()||'—';$('balls').setAttribute('aria-label',game.balls+' bolas');
     $('charge').style.height=game.charge*100+'%';$('launch').disabled=game.status!=='playing'||game.launched||!!game.lossDelay||paused;
-    $('message').textContent=paused?'EN PAUSA · CONTINÚA CUANDO QUIERAS':game.elapsed<game.tiltUntil?'TILT · EXCESO DE SACUDIDAS':game.status==='ready'?'CONSTRUYE TU CASA CON TODO':game.status==='finished'?'¡GRACIAS POR JUGAR!':game.lossDelay?'BOLA PERDIDA · PREPARANDO LANZADOR':!game.launched?'MANTÉN Y SUELTA PARA LANZAR':game.entered?'ENCIENDE LOS SIETE OBJETIVOS':game.rampDirection<0?'LANZAMIENTO DÉBIL · CARGA MÁS FUERZA':game.travelState==='RAMP_TRAVEL'?'RECORRIENDO EL CANAL':'¡LANZAMIENTO!';
+    $('message').textContent=paused?'EN PAUSA · CONTINÚA CUANDO QUIERAS':game.elapsed<game.tiltUntil?'TILT · EXCESO DE SACUDIDAS':game.status==='ready'?'CONSTRUYE TU CASA CON TODO':game.status==='finished'?'¡GRACIAS POR JUGAR!':game.lossDelay?'BOLA PERDIDA · PREPARANDO LANZADOR':!game.launched?'MANTÉN Y SUELTA PARA LANZAR':game.elapsed<game.bonusBannerUntil?'¡SIETE OBJETIVOS! +3.000 PUNTOS · +1 BOLA':game.entered?`${game.targetsActivated.size}/7 OBJETIVOS ENCENDIDOS`:game.rampDirection<0?'LANZAMIENTO DÉBIL · CARGA MÁS FUERZA':game.travelState==='RAMP_TRAVEL'?'RECORRIENDO EL CANAL':'¡LANZAMIENTO!';
     const duration=performance.now()-begin;maxFrame=Math.max(maxFrame,duration);totalFrame+=duration;frameCount++;requestAnimationFrame(frame);
   }
   // Controlled test instrumentation is only exposed under ?test=1; contacts
