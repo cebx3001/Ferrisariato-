@@ -1,0 +1,38 @@
+✔ Real shooter lane enters the field: charge 0 (152.364666ms)
+✔ Real shooter lane enters the field: charge 0.25 (123.761799ms)
+✔ Real shooter lane enters the field: charge 0.5 (146.291067ms)
+✔ Real shooter lane enters the field: charge 0.75 (98.658923ms)
+✔ Real shooter lane enters the field: charge 1 (101.275817ms)
+✔ bumper-top: physical collision, rebound, score and light (38.493159ms)
+✔ bumper-left: physical collision, rebound, score and light (45.615053ms)
+✔ bumper-right: physical collision, rebound, score and light (37.18678ms)
+✔ tank-left: physical collision, rebound, score and light (38.829015ms)
+✔ tank-right: physical collision, rebound, score and light (56.4938ms)
+✔ target-1: independent contact and light (31.810496ms)
+✔ target-2: independent contact and light (29.991815ms)
+✔ target-3: independent contact and light (31.837958ms)
+✔ target-4: independent contact and light (30.365869ms)
+✔ target-5: independent contact and light (33.354183ms)
+✔ target-6: independent contact and light (35.012142ms)
+✔ target-7: independent contact and light (37.996169ms)
+✔ sling-left: active triangular rebound (31.313507ms)
+✔ sling-right: active triangular rebound (57.943986ms)
+✔ left: motor sweeps, hits the ball and returns (44.653123ms)
+✔ right: motor sweeps, hits the ball and returns (61.081145ms)
+✔ Drain decrements lives, respawns and ends on the third loss (60.466393ms)
+✔ Timer is real simulation time; reset clears score, lights, controls and lives (57.914691ms)
+✔ High-speed ball respects both side walls with continuous collision detection (58.093211ms)
+✔ Playing for 60 seconds keeps bodies finite and bounded without stuck launch (2118.357842ms)
+✔ Single ramp: physical sensor, monotonic travel, collision isolation and tangent handoff (55.840074ms)
+✔ Ramp restart, new ball and timeout discard guided state (55.207111ms)
+✔ Ramp has continuous floor, clear width, one endpoint and no descending floor overshoot (1.209173ms)
+✔ Physical guide posts match visible supports and leave the ramp mouth clear (30.666472ms)
+✔ Reference flippers have a broad pivot and a narrower physical tip (30.544589ms)
+ℹ tests 30
+ℹ suites 0
+ℹ pass 30
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3860.610234

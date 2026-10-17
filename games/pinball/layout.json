@@ -180,7 +180,7 @@
       "id": "target-1",
       "x": 2.0,
       "y": 4.2,
-      "label": "Construcción"
+      "label": "Construcci\u00f3n"
     },
     {
       "id": "target-2",
@@ -204,13 +204,13 @@
       "id": "target-5",
       "x": 5.6,
       "y": 4.2,
-      "label": "Plomería"
+      "label": "Plomer\u00eda"
     },
     {
       "id": "target-6",
       "x": 6.5,
       "y": 4.2,
-      "label": "Jardín"
+      "label": "Jard\u00edn"
     },
     {
       "id": "target-7",
@@ -3249,7 +3249,7 @@
     ],
     "length": 27.046106
   },
-  "flipperRadius": 0.21,
+  "flipperRadius": 0.28,
   "posts": [
     {
       "id": "guide-post-0",
@@ -3509,5 +3509,6 @@
       "y": 6.695867,
       "radius": 0.065
     }
-  ]
+  ],
+  "flipperTipRadius": 0.18
 }

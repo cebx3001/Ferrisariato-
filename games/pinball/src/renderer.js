@@ -1,5 +1,5 @@
 export class Renderer {
-  constructor(canvas,projection,layout,background,interactives,foreground,glass,ballSprite,depth){Object.assign(this,{canvas,projection,layout,background,interactives,foreground,glass,ballSprite});this.ctx=canvas.getContext('2d',{alpha:false});this.debug=false;
+  constructor(canvas,projection,layout,background,interactives,foreground,glass,ballSprite,depth,flipperAtlas,flipperFrames){Object.assign(this,{canvas,projection,layout,background,interactives,foreground,glass,ballSprite,flipperAtlas,flipperFrames});this.ctx=canvas.getContext('2d',{alpha:false});this.debug=false;
     if(depth){const dc=document.createElement('canvas');dc.width=depth.width;dc.height=depth.height;const dx=dc.getContext('2d',{willReadFrequently:true});dx.drawImage(depth,0,0);this.depth=dx.getImageData(0,0,dc.width,dc.height).data;}
     this.ballCanvas=document.createElement('canvas');this.ballCanvas.width=this.ballCanvas.height=128;this.ballContext=this.ballCanvas.getContext('2d',{willReadFrequently:true});this.ballContext.drawImage(ballSprite,0,0,128,128);this.ballPixels=this.ballContext.getImageData(0,0,128,128);
   }
@@ -49,34 +49,21 @@ export class Renderer {
     }
     for(const s of this.layout.slings)if((game.lights.get(s.id)||0)>game.elapsed){c.save();c.globalCompositeOperation='screen';this.poly(s.vertices,.42,'#ffe84a66','#fff4aa',3);c.restore();}
     c.drawImage(this.foreground,0,0,this.canvas.width,this.canvas.height);this.rampLights(game);
+    this.flipperRenderFrames={};
     for(const f of game.flippers){
-      const a=f.body.GetAngle(),ex=f.x+Math.cos(a)*f.length,ey=f.y+Math.sin(a)*f.length;
-      const capsule=radius=>{
-        const shape=[];
-        for(let i=0;i<=18;i++){const t=a-Math.PI/2+i*Math.PI/18;shape.push([ex+Math.cos(t)*radius,ey+Math.sin(t)*radius]);}
-        for(let i=0;i<=18;i++){const t=a+Math.PI/2+i*Math.PI/18;shape.push([f.x+Math.cos(t)*radius,f.y+Math.sin(t)*radius]);}
-        return shape;
-      };
-      const shape=capsule(this.layout.flipperRadius||.14),fp=this.point(f.x,f.y,.43),ep=this.point(ex,ey,.43);
-      this.poly(shape.map(([x,y])=>[x+.035,y+.055]),.025,'#0009');
-      this.ellipse(f.x,f.y,.10,.20,'#12202c');
-      this.ellipse(f.x,f.y,.16,.18,'#b5c9d8');
-      this.ellipse(f.x,f.y,.19,.13,'#223c56');
-      // Real vertical side faces retain the same Box2D center line and footprint.
-      const side=c.createLinearGradient(0,fp.y-8,0,fp.y+24);
-      side.addColorStop(0,'#2874c7');side.addColorStop(.25,'#074e9c');side.addColorStop(.6,'#002557');side.addColorStop(1,'#020e26');
-      const sides=shape.map((p,i)=>{const q=shape[(i+1)%shape.length];return [this.point(...p,.12),this.point(...q,.12),this.point(...q,.42),this.point(...p,.42)];});
-      sides.sort((a,b)=>a.reduce((n,p)=>n+p.y,0)-b.reduce((n,p)=>n+p.y,0));
-      for(const face of sides){c.beginPath();face.forEach((p,i)=>i?c.lineTo(p.x,p.y):c.moveTo(p.x,p.y));c.closePath();c.fillStyle=side;c.fill();}
-      this.poly(shape,.42,'#063b82','#739cc1',1.3);
-      const cap=capsule((this.layout.flipperRadius||.14)-.04),enamel=c.createLinearGradient(fp.x,fp.y-12,ep.x,ep.y+8);
-      enamel.addColorStop(0,'#fffef4');enamel.addColorStop(.35,'#eaf0f6');enamel.addColorStop(.65,'#fcffff');enamel.addColorStop(1,'#c2d2e3');
-      this.poly(cap,.455,'#6e829c');this.poly(cap,.49,enamel,'#f8ffff',.7);
-      const screw=(x,y)=>{this.ellipse(x,y,.502,.031,'#4b627b');this.ellipse(x-.006,y-.006,.505,.022,'#f2f8ff');const p=this.point(x,y,.507);c.strokeStyle='#163653';c.lineWidth=.7;c.beginPath();c.moveTo(p.x-1.1,p.y);c.lineTo(p.x+1.1,p.y);c.stroke();};
-      screw(f.x,f.y);screw(ex,ey);
-      const hx=f.x+Math.cos(a)*.25,hy=f.y+Math.sin(a)*.25;
-      const tr=(u,v)=>[hx+u*Math.cos(a)-v*Math.sin(a),hy+u*Math.sin(a)+v*Math.cos(a)];
-      this.poly([tr(-.07,.045),tr(-.07,-.045),tr(0,-.085),tr(.07,-.045),tr(.07,.045),tr(.018,.045),tr(.018,0),tr(-.018,0),tr(-.018,.045)],.51,'#104c8b');
+      const frames=this.flipperFrames.frames[f.id],angle=f.body.GetAngle();
+      const frame=frames.reduce((best,p)=>Math.abs(p.angle-angle)<Math.abs(best.angle-angle)?p:best,frames[0]);
+      // These are the actual modeled blue body, rubber, white cap and fittings,
+      // rendered by Cycles from the same camera at each motor angle.
+      this.flipperRenderFrames[f.id]={angle:frame.angle,physicalAngle:angle};
+      const root=this.layout.flipperRadius,tip=this.layout.flipperTipRadius,q=Math.acos((root-tip)/f.length);
+      const contour=[];
+      for(let i=0;i<=16;i++){const t=-q+2*q*i/16;contour.push([f.length+tip*Math.cos(t),tip*Math.sin(t)]);}
+      for(let i=0;i<=20;i++){const t=q+(Math.PI*2-2*q)*i/20;contour.push([root*Math.cos(t),root*Math.sin(t)]);}
+      this.poly(contour.map(([x,y])=>[f.x+x*Math.cos(angle)-y*Math.sin(angle)+.025,f.y+x*Math.sin(angle)+y*Math.cos(angle)+.04]),.025,'#0006');
+      this.ellipse(f.x,f.y,.025,.25,'#0007');
+      const sx=this.canvas.width/this.flipperFrames.width,sy=this.canvas.height/this.flipperFrames.height;
+      c.drawImage(this.flipperAtlas,frame.sx,frame.sy,frame.width,frame.height,frame.x*sx,frame.y*sy,frame.width*sx,frame.height*sy);
     }
     const b=game.rampPose||game.ball.GetPosition(),z=game.rampPose?b.z+this.layout.ballRadius+.01:this.layout.ballRadius+.05;
     const p=this.point(b.x,b.y,z),r=Math.abs(this.point(b.x+this.layout.ballRadius,b.y,z).x-p.x),size=r*2.3125;

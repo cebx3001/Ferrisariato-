@@ -1,5 +1,7 @@
 # Ferrisariato · Precisión V4
 
+> Documento de la base V4. La corrección actual de flippers, slingshots, microescenas y reflejos se documenta en [COMPONENT_REVIEW.md](COMPONENT_REVIEW.md).
+
 La implementación actual está en `/games/pinball/`. V4 modifica la escena V3 existente, conserva las versiones anteriores y conecta el plunger con un único canal elevado jugable. El logotipo conserva los píxeles y la proporción del recurso oficial.
 
 ## Entrega

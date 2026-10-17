@@ -91,3 +91,14 @@ test('Physical guide posts match visible supports and leave the ramp mouth clear
  const p=layout.posts.find(o=>o.id.startsWith('channel-support'));
  place(g,p.x+.5,p.y,-5,0);step(g,.1);assert.ok(g.ball.GetLinearVelocity().x>0);assert.equal(g.score,0);
 });
+
+test('Reference flippers have a broad pivot and a narrower physical tip',()=>{
+ const g=make();
+ assert.ok(layout.flipperRadius>layout.flipperTipRadius);
+ for(const f of g.flippers){
+  const inside=(x,y)=>{const p=f.body.GetWorldPoint(new b.b2Vec2(x,y),new b.b2Vec2());for(let fx=f.body.GetFixtureList();fx;fx=fx.GetNext())if(fx.TestPoint(p))return true;return false;};
+  assert.ok(inside(0,layout.flipperRadius-.02),'Pivot uses the modeled broad body');
+  assert.ok(inside(f.length,layout.flipperTipRadius-.02),'Nose retains its solid collision surface');
+  assert.equal(inside(f.length,layout.flipperRadius-.02),false,'No invisible capsule-width contact around narrow nose');
+ }
+});

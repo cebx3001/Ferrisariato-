@@ -1,16 +1,21 @@
 {
-  "objects": 5003,
-  "lights": 263,
-  "sharedMeshes": 152,
+  "revision": "5.4",
+  "flipperPosesPerSide": 31,
+  "denseWorkshopAddedParts": 2408,
+  "rearTerracesPopulated": true,
+  "objects": 7396,
+  "lights": 273,
+  "sharedMeshes": 244,
   "collections": {
-    "Collection": 637,
+    "Collection": 285,
     "Foreground decorative raised channels": 330,
-    "Interactive bumper tank target sling art": 434,
-    "Movable elements": 34,
-    "Photographic workshop miniatures": 736,
-    "Precision structural detailing": 570,
-    "Premium structural detailing": 1242,
-    "Protective glass reflections": 34
+    "Interactive bumper tank target sling art": 456,
+    "Movable elements": 22,
+    "Photographic workshop miniatures": 266,
+    "Precision structural detailing": 207,
+    "Premium structural detailing": 573,
+    "Protective glass reflections": 34,
+    "Reference V5 / workshop assets": 4901
   },
   "camera": {
     "position": [
@@ -25,12 +30,12 @@
       1320,
       1980
     ],
-    "heroSamples": 96,
+    "heroSamples": 64,
     "web": [
       880,
       1320
     ],
-    "webSamples": 48,
+    "webSamples": 32,
     "engine": "Cycles",
     "viewTransform": "AgX"
   },

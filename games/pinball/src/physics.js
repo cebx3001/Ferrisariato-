@@ -35,10 +35,13 @@ export class PinballPhysics {
     if(this.layout.ramp){const shape=new b.b2PolygonShape();shape.SetAsBox(.32,.08);const sensor=this.fixture(this.body(...this.layout.ramp.sensor),shape,{id:'ramp-entry',type:'ramp-entry'});sensor.SetSensor(true);}
     this.flippers=this.layout.flippers.map((o,i)=> {
       const body=this.body(o.x,o.y,true); body.SetAngle(o.rest);
-      const shape=new b.b2PolygonShape();shape.SetAsOrientedBox(o.length/2,this.layout.flipperRadius||.14,new b.b2Vec2(o.length/2,0),0);
+      const root=this.layout.flipperRadius||.14,tip=this.layout.flipperTipRadius||root;
+      const nx=(root-tip)/o.length,ny=Math.sqrt(1-nx*nx);
+      const shape=new b.b2PolygonShape();
+      shape.Set([[root*nx,root*ny],[o.length+tip*nx,tip*ny],[o.length+tip*nx,-tip*ny],[root*nx,-root*ny]].map(p=>new b.b2Vec2(...p)),4);
       this.fixture(body,shape,{id:o.id,type:'flipper'},.25,10);
       for(const x of [0,o.length]) {
-        const cap=new b.b2CircleShape(this.layout.flipperRadius||.14);cap.m_p.SetXY(x,0);
+        const cap=new b.b2CircleShape(x===0?root:tip);cap.m_p.SetXY(x,0);
         this.fixture(body,cap,{id:o.id,type:'flipper'},.25,10);
       }
       const def=new b.b2RevoluteJointDef();def.Initialize(this.ground,body,new b.b2Vec2(o.x,o.y));

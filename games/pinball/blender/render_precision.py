@@ -7,6 +7,7 @@ from mathutils import Vector
 ROOT=Path(__file__).resolve().parents[1]
 args=sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else ['preview']
 mode=args[0];scene=bpy.context.scene
+print('RENDER_SOURCE',len(scene.objects),'SCULPTED_DRILL',scene.get('sculpted_drill_review'),'POPULATED_REAR',scene.get('rear_visible_terraces_populated'),flush=True)
 layers={'interactives':bpy.data.collections['Interactive bumper tank target sling art'],'foreground':bpy.data.collections['Foreground decorative raised channels'],'glass':bpy.data.collections['Protective glass reflections']}
 dynamic=bpy.data.collections['Movable elements']
 work=Path('/tmp/ferrisariato-precision');work.mkdir(exist_ok=True)
@@ -21,9 +22,10 @@ out=n.new('CompositorNodeComposite');background=n.new('CompositorNodeAlphaOver')
 post.render.image_settings.file_format='PNG';post.render.image_settings.color_mode='RGBA';post.render.resolution_percentage=100
 selected=['table','interactives','foreground','glass','ball'] if mode=='web' else [mode]
 for name in selected:
-    hero=name in {'hero','preview'};ball=name=='ball'
-    scene.render.resolution_x=1320 if name=='hero' else 660 if name=='preview' else 128 if ball else 880
-    scene.render.resolution_y=1980 if name=='hero' else 990 if name=='preview' else 128 if ball else 1320
+    hero=name in {'hero','preview'} or name.startswith(('detail-','macro-'));ball=name=='ball'
+    scene.render.resolution_x=720 if name.startswith('macro-') else 1760 if name.startswith('detail-') else 1320 if name=='hero' else 660 if name=='preview' else 128 if ball else 880
+    scene.render.resolution_y=960 if name.startswith('macro-') else 2640 if name.startswith('detail-') else 1980 if name=='hero' else 990 if name=='preview' else 128 if ball else 1320
+    scene.render.resolution_x=int(os.environ.get('PINBALL_OUTPUT_WIDTH',scene.render.resolution_x));scene.render.resolution_y=int(os.environ.get('PINBALL_OUTPUT_HEIGHT',scene.render.resolution_y))
     scene.render.resolution_percentage=100;scene.cycles.samples=int(os.environ.get('PINBALL_SAMPLES',96 if name=='hero' else 32 if name=='preview' else 64))
     dynamic.hide_render=not(hero or ball)
     for key,collection in layers.items():collection.hide_render=not(hero or key==name or name=='ball')
@@ -50,17 +52,18 @@ for name in selected:
         b=bpy.data.objects['Editable chrome ball'];data=original_camera.data.copy();data.type='ORTHO';data.ortho_scale=.37;data.shift_x=0;data.shift_y=0
         camera=bpy.data.objects.new('Ball sprite export camera',data);scene.collection.objects.link(camera)
         camera.rotation_euler=original_camera.rotation_euler;direction=original_camera.rotation_euler.to_quaternion()@Vector((0,0,1));camera.location=b.location+direction*3;scene.camera=camera
-    border=os.environ.get('PINBALL_BORDER_BOTTOM');scene.render.use_border=bool(border);scene.render.use_crop_to_border=bool(border)
+    border=os.environ.get('PINBALL_BORDER_BOTTOM');crop=os.environ.get('PINBALL_DETAIL_BORDER');scene.render.use_border=bool(border or crop);scene.render.use_crop_to_border=bool(border or crop)
+    if crop:scene.render.border_min_x,scene.render.border_min_y,scene.render.border_max_x,scene.render.border_max_y=map(float,crop.split(','))
     if border:scene.render.border_min_x=0;scene.render.border_max_x=1;scene.render.border_min_y=0;scene.render.border_max_y=float(border)
     raw=work/(name+'-raw.exr');clean=work/(name+'-clean.exr');scene.render.filepath=str(raw)
     bpy.ops.render.render(write_still=True,scene=scene.name)
     env=os.environ.copy();env['PYTHONPATH']=os.environ.get('PINBALL_PYTHONPATH','/workspace/.cache/ferrisariato-python');env['OIDN_BIN']=os.environ.get('OIDN_BIN','/workspace/.cache/oidn-2.3.3.x86_64.linux/bin/oidnDenoise')
     subprocess.run([os.environ.get('PINBALL_PYTHON',shutil.which('python3')),str(ROOT/'scripts/denoise.py'),str(raw),str(clean)],check=True,env=env)
     im.image=bpy.data.images.load(str(clean));post.node_tree.links.new(background.outputs[0] if hero else im.outputs[0],gl.inputs[0]);post.render.resolution_x=scene.render.resolution_x;post.render.resolution_y=scene.render.resolution_y
-    if border:post.render.resolution_x=im.image.size[0];post.render.resolution_y=im.image.size[1]
+    if border or crop:post.render.resolution_x=im.image.size[0];post.render.resolution_y=im.image.size[1]
     # Preserve alpha for overlay layers; glare is already physically bright in the base.
     gl.mix=-1 if name in {'glass','ball','interactives','foreground'} else -.93
-    dest=ROOT/'docs'/('precision-'+name+'.png') if hero else Path(os.environ.get('PINBALL_ASSET_STAGE',str(ROOT/'assets')))/(name+'.png')
+    dest=Path(os.environ.get('PINBALL_DOCUMENT_STAGE',str(ROOT/'docs')))/('precision-'+name+'.png') if hero else Path(os.environ.get('PINBALL_ASSET_STAGE',str(ROOT/'assets')))/(name+'.png')
     if border:dest=Path('/tmp/precision-apron')/(name+'.png');dest.parent.mkdir(exist_ok=True)
     post.render.filepath=str(dest);bpy.ops.render.render(write_still=True,scene=post.name)
     for o in hidden:o.visible_camera=True

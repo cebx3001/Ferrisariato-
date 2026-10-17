@@ -1,0 +1,37 @@
+{
+  "version": "5.0",
+  "objects": 1427,
+  "assets": [
+    "flipper-left",
+    "flipper-right",
+    "hand tools",
+    "left brick and timber",
+    "left carpentry",
+    "left front hardware",
+    "left lower workshop",
+    "left rear masonry 1.35",
+    "left rear masonry 2.9",
+    "left rear masonry 4.25",
+    "left toolbox",
+    "right construction",
+    "right industrial case",
+    "right lower masonry",
+    "right painting",
+    "right power tools",
+    "right rear masonry 1.35",
+    "right rear masonry 2.9",
+    "right rear masonry 4.25",
+    "sling-left",
+    "sling-right"
+  ],
+  "flippers": {
+    "rootRadius": 0.28,
+    "tipRadius": 0.18,
+    "layers": 4,
+    "topFasteners": false
+  },
+  "source": [
+    "2-43989.jpg",
+    "5-43991.jpg"
+  ]
+}

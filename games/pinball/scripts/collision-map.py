@@ -13,7 +13,9 @@ for b in d['bumpers']:
 for t in d['targets']:parts.append(f'<rect x="{t["x"]-.31}" y="{t["y"]-.17}" width=".62" height=".34" fill="#e8b72f"/>')
 for s in d['slings']:poly(s['vertices']+[s['vertices'][0]],'#ffbb43',.04,'#735126')
 for f in d['flippers']:
- x,y=f['x'],f['y'];e=[x+math.cos(f['rest'])*f['length'],y+math.sin(f['rest'])*f['length']];poly([[x,y],e],'#e9f4ff',d['flipperRadius']*2)
+ x,y,a,L=f['x'],f['y'],f['rest'],f['length'];r=d['flipperRadius'];t=d.get('flipperTipRadius',r);q=math.acos((r-t)/L)
+ local=[(L+t*math.cos(v),t*math.sin(v)) for v in [-q+2*q*i/24 for i in range(25)]]+[(r*math.cos(v),r*math.sin(v)) for v in [q+(math.tau-2*q)*i/32 for i in range(33)]]
+ shape=[(x+u*math.cos(a)-v*math.sin(a),y+u*math.sin(a)+v*math.cos(a)) for u,v in local];poly(shape+[shape[0]],'#e9f4ff',.02,'#2865ab')
 r=d['ramp'];route=[p[:2] for p in r['samples']];poly(route,'#263e74',r['innerWidth']);poly(route,'#ed67fc',.04)
 for i in range(0,len(route),40):
  x,y,z=r['samples'][i];text(x-.25,y-.16,f'z={z:.2f}',.12)

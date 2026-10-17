@@ -1,8 +1,8 @@
 {
   "physics": {
-    "passed": 29,
+    "passed": 30,
     "failed": 0,
-    "report": "precision-physics.tap"
+    "report": "component-tests/physics.txt"
   },
   "browserRegression": {
     "passed": 12,
@@ -28,5 +28,12 @@
     "Mobile validation uses Chromium touch emulation, not physical phones",
     "Global illumination and environment reflections are prerendered",
     "Visual comparison is supplied; software tests do not certify photographic equivalence"
-  ]
+  ],
+  "revision": "5.4",
+  "componentsBrowser": {
+    "passed": 5,
+    "failed": 0,
+    "report": "component-tests/results.json"
+  },
+  "totalPassed": 58
 }

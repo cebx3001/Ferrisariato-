@@ -1,12 +1,13 @@
-import {PinballPhysics} from './physics.js';
-import {Renderer} from './renderer.js';
+import {PinballPhysics} from './physics.js?v=reference-5.4';
+import {Renderer} from './renderer.js?v=reference-5.4';
 import {PinballAudio} from './audio.js';
+const BUILD='reference-5.4';
 const $=id=>document.getElementById(id),audio=new PinballAudio();
-const image=src=>new Promise((resolve,reject)=>{const i=new Image();i.onload=()=>resolve(i);i.onerror=()=>reject(Error('No se pudo cargar '+src));i.src=src;});
-const json=async url=>{const r=await fetch(url);if(!r.ok)throw Error('No se pudo cargar '+url);return r.json();};
+const image=src=>new Promise((resolve,reject)=>{const i=new Image();i.onload=()=>resolve(i);i.onerror=()=>reject(Error('No se pudo cargar '+src));i.src=src+'?v='+BUILD;});
+const json=async url=>{const r=await fetch(url+'?v='+BUILD);if(!r.ok)throw Error('No se pudo cargar '+url);return r.json();};
 try {
-  const [layout,projection,background,interactives,foreground,glass,ballSprite,depth]=await Promise.all([json('./layout.json'),json('./assets/projection.json'),image('./assets/table.webp'),image('./assets/interactives.webp'),image('./assets/foreground.webp'),image('./assets/glass.webp'),image('./assets/ball.webp'),image('./assets/depth.png')]);
-  const game=new PinballPhysics(window.box2d,layout),renderer=new Renderer($('table'),projection,layout,background,interactives,foreground,glass,ballSprite,depth);
+  const [layout,projection,background,interactives,foreground,glass,ballSprite,depth,flipperAtlas,flipperFrames]=await Promise.all([json('./layout.json'),json('./assets/projection.json'),image('./assets/table.webp'),image('./assets/interactives.webp'),image('./assets/foreground.webp'),image('./assets/glass.webp'),image('./assets/ball.webp'),image('./assets/depth.png'),image('./assets/flippers.webp'),json('./assets/flippers.json')]);
+  const game=new PinballPhysics(window.box2d,layout),renderer=new Renderer($('table'),projection,layout,background,interactives,foreground,glass,ballSprite,depth,flipperAtlas,flipperFrames);
   await document.fonts.load('54px PinballSegment');
   const params=new URLSearchParams(location.search);renderer.debug=params.has('debug');
   let paused=false,accumulator=0,last=performance.now(),frameCount=0,maxFrame=0,totalFrame=0;

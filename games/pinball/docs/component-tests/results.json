@@ -1,0 +1,27 @@
+{
+  "checks": [
+    {
+      "test": "Both assembled Blender models load as 31 Cycles motor poses each",
+      "passed": true
+    },
+    {
+      "test": "left model follows the real pivot at active and rest angles",
+      "passed": true,
+      "maxAngleErrorRadians": 0.022
+    },
+    {
+      "test": "right model follows the real pivot at active and rest angles",
+      "passed": true,
+      "maxAngleErrorRadians": 0.022
+    },
+    {
+      "test": "General view, six closeups, references and before/after images are reachable",
+      "passed": true
+    },
+    {
+      "test": "No JavaScript errors in the game or review page",
+      "passed": true
+    }
+  ],
+  "errors": []
+}

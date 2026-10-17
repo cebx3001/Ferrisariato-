@@ -16,32 +16,32 @@
   "desktop_performance": {
     "travelState": "RAMP_TRAVEL",
     "ramp": {
-      "x": 1.4292815373715795,
-      "y": 5.48957651057369,
-      "z": 0.7423083952482512,
+      "x": 1.4311231306102505,
+      "y": 5.516410478598202,
+      "z": 0.7257272929961407,
       "tangent": [
         0.05828333771519929,
         0.8492500883312137,
         -0.5247640803391573
       ],
-      "distance": 24.59046900000007,
-      "progress": 0.9092055248175123
+      "distance": 24.622066222222145,
+      "progress": 0.9103737973304602
     },
     "ballActive": false,
     "status": "playing",
     "score": 0,
-    "remaining": 116.74166666666667,
+    "remaining": 116.73333333333335,
     "balls": 3,
     "charge": 0,
     "launched": true,
     "entered": false,
     "position": {
-      "x": 1.4292815373715795,
-      "y": 5.48957651057369
+      "x": 1.4311231306102505,
+      "y": 5.516410478598202
     },
     "velocity": {
       "x": 0,
-      "y": -24.519079117666234
+      "y": -24.567653790941574
     },
     "flippers": [
       {
@@ -74,6 +74,10 @@
       },
       {
         "sample": 392,
+        "side": -1
+      },
+      {
+        "sample": 392,
         "side": 1
       },
       {
@@ -87,9 +91,9 @@
     ],
     "ballVisibleFraction": 1,
     "paused": false,
-    "frames": 631,
-    "averageFrameMs": 1.6110935025802693,
-    "maxFrameMs": 15
+    "frames": 571,
+    "averageFrameMs": 1.7278458846377407,
+    "maxFrameMs": 18.700000002980232
   },
   "errors": [],
   "failed_requests": []

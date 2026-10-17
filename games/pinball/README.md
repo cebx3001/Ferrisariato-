@@ -3,6 +3,8 @@
 Prueba de concepto independiente. Ruta de publicación: `/games/pinball/`.
 No modifica HOME, IN-STORE ni el manifiesto de dependencias de la raíz.
 
+La revisión actual de componentes y densidad es **V5**: [capturas, acercamientos y evidencia](docs/component-review.html). Los detalles de modelado, integración y reproducción están en [COMPONENT_REVIEW.md](COMPONENT_REVIEW.md).
+
 ## Ejecutar
 
 Desde la raíz del repositorio:
@@ -142,6 +144,7 @@ La ruta utiliza el mismo alojamiento estático GitHub Pages que el resto del
 repositorio. No requiere compilación ni servicios externos.
 
 - Juego: `https://cebx3001.github.io/Ferrisariato-/games/pinball/`
+- Componentes y densidad: `https://cebx3001.github.io/Ferrisariato-/games/pinball/docs/component-review.html`
 - Comparación visual: `https://cebx3001.github.io/Ferrisariato-/games/pinball/docs/precision-comparison.html`
 
 La disponibilidad pública depende de que finalice correctamente el despliegue de Pages de la rama `main`.
