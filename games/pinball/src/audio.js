@@ -1,6 +1,19 @@
 export class PinballAudio {
   constructor(){this.enabled=true;this.context=null;this.played=0;}
-  async unlock(){if(!this.context){const C=window.AudioContext||window.webkitAudioContext;if(C)this.context=new C();}if(this.context?.state==='suspended')await this.context.resume();}
+  async unlock(){
+    // Create/resume synchronously from a tap or key press when possible.
+    // Safari may report "interrupted" instead of "suspended" after a prompt.
+    if(!this.context){
+      const C=window.AudioContext||window.webkitAudioContext;
+      if(!C)return false;
+      this.context=new C();
+    }
+    if(this.context.state!=='running'){
+      try{await this.context.resume();}
+      catch(error){console.warn('Could not resume pinball audio',error);return false;}
+    }
+    return this.context.state==='running';
+  }
   // Seven-note ascending chime, with a bright chord on the seventh target.
   bonusStep(index){
     if(!this.enabled||!this.context||this.context.state!=='running')return;
@@ -21,7 +34,12 @@ export class PinballAudio {
     }
   }
   play(kind,id=''){
-    if(!this.enabled||!this.context||this.context.state!=='running')return;
+    if(!this.enabled)return;
+    if(!this.context||this.context.state!=='running'){
+      // Avoid losing the first cue when AudioContext.resume() is asynchronous.
+      void this.unlock().then(ready=>{if(ready&&this.enabled)this.play(kind,id);});
+      return;
+    }
     const c=this.context,t=c.currentTime;const osc=c.createOscillator(),gain=c.createGain();
     const variation=[...id].reduce((s,v)=>s+v.charCodeAt(0),0)%7;
     const freq=kind==='target'?700+variation*75:kind==='bumper'?390+variation*55:kind==='sling'?240:kind==='launch'?120:kind==='finish'?200:90;
