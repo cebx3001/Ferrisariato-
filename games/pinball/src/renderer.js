@@ -43,9 +43,18 @@ export class Renderer {
     const c=this.ctx;c.fillStyle='#07203a';c.fillRect(0,0,this.canvas.width,this.canvas.height);c.drawImage(this.background,0,0,this.canvas.width,this.canvas.height);c.drawImage(this.interactives,0,0,this.canvas.width,this.canvas.height);
     for(const o of this.layout.bumpers){const lit=(game.lights.get(o.id)||0)>game.elapsed;if(lit){c.save();c.globalCompositeOperation='screen';const p=this.point(o.x,o.y,.45);const r=Math.abs(this.point(o.x+o.radius*2,o.y,.45).x-p.x);const gr=c.createRadialGradient(p.x,p.y,2,p.x,p.y,r);gr.addColorStop(0,'#ffffcbbb');gr.addColorStop(.4,'#ffd22b99');gr.addColorStop(1,'#ffad0000');c.fillStyle=gr;c.fillRect(p.x-r,p.y-r,r*2,r*2);this.ellipse(o.x,o.y,o.kind==='tank'?1.0:.77,o.radius*.9,'#ffdb4344');c.restore();}}
     for(const [i,o] of this.layout.targets.entries()){
-      const lit=(game.lights.get(o.id)||0)>game.elapsed;const p=this.point(o.x,o.y+.23,.49);if(lit)this.icon(i,p,true);
-
-      if(lit){const p=this.point(o.x,o.y+.25,.18);c.save();c.shadowColor='#ffce00';c.shadowBlur=28;c.fillStyle='#ffe04d';c.beginPath();c.arc(p.x,p.y,7,0,Math.PI*2);c.fill();c.restore();}
+      const pulse=(game.lights.get(o.id)||0)>game.elapsed;
+      const active=game.targetsActivated?.has(o.id)===true;
+      const p=this.point(o.x,o.y+.23,.49);
+      if(pulse||active)this.icon(i,p,true);
+      // The seven lamps stay visibly lit after each distinct hit.
+      // A larger glow chases across them during the completion celebration.
+      if(pulse||active){
+        const lamp=this.point(o.x,o.y+.25,.18);
+        c.save();c.shadowColor='#ffce00';c.shadowBlur=pulse?32:12;
+        c.fillStyle=pulse?'#fff0a0':'#eec548';
+        c.beginPath();c.arc(lamp.x,lamp.y,pulse?8:4,0,Math.PI*2);c.fill();c.restore();
+      }
     }
     for(const s of this.layout.slings)if((game.lights.get(s.id)||0)>game.elapsed){c.save();c.globalCompositeOperation='screen';this.poly(s.vertices,.42,'#ffe84a66','#fff4aa',3);c.restore();}
     c.drawImage(this.foreground,0,0,this.canvas.width,this.canvas.height);this.rampLights(game);
