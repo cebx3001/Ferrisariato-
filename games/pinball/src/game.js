@@ -1,7 +1,7 @@
-import {PinballPhysics} from './physics.js?v=reference-5.7';
-import {Renderer} from './renderer.js?v=reference-5.7';
-import {PinballAudio} from './audio.js?v=reference-5.7';
-const BUILD='reference-5.7';
+import {PinballPhysics} from './physics.js?v=reference-5.8';
+import {Renderer} from './renderer.js?v=reference-5.8';
+import {PinballAudio} from './audio.js?v=reference-5.8';
+const BUILD='reference-5.8';
 const $=id=>document.getElementById(id),audio=new PinballAudio();
 const image=src=>new Promise((resolve,reject)=>{const i=new Image();i.onload=()=>resolve(i);i.onerror=()=>reject(Error('No se pudo cargar '+src));i.src=src+'?v='+BUILD;});
 const json=async url=>{const r=await fetch(url+'?v='+BUILD);if(!r.ok)throw Error('No se pudo cargar '+url);return r.json();};
@@ -44,9 +44,11 @@ try {
       catch(_){}
     }else listen();
   };
-  const start=()=>{enableMotion();clear();game.start();paused=false;accumulator=0;last=performance.now();$('overlay').hidden=true;$('pause').textContent='PAUSAR';$('pause').disabled=false;$('restart').disabled=false;audio.unlock();$('table').focus({preventScroll:true});};
+  // Audio must be unlocked FIRST, while the start tap still has user activation.
+  // In particular, iOS motion permission prompts can consume that activation.
+  const start=()=>{audio.unlock();enableMotion();clear();game.start();paused=false;accumulator=0;last=performance.now();$('overlay').hidden=true;$('pause').textContent='PAUSAR';$('pause').disabled=false;$('restart').disabled=false;audio.unlock();$('table').focus({preventScroll:true});};
   $('start').disabled=false;$('start').innerHTML='INICIAR PARTIDA <span>↗</span>';$('start').onclick=start;$('restart').onclick=start;
-  $('sound').onclick=()=>{audio.enabled=!audio.enabled;$('sound').textContent='SONIDO: '+(audio.enabled?'SÍ':'NO');$('sound').setAttribute('aria-pressed',String(audio.enabled));if(audio.enabled)audio.unlock();};
+  $('sound').onclick=()=>{audio.enabled=!audio.enabled;$('sound').textContent='SONIDO: '+(audio.enabled?'SÍ':'NO');$('sound').setAttribute('aria-pressed',String(audio.enabled));if(audio.enabled)audio.unlock().then(()=>audio.play('launch')).catch(error=>console.warn('Audio unlock failed',error));};
   const togglePause=()=>{if(game.status!=='playing')return;paused=!paused;clear();$('pause').textContent=paused?'CONTINUAR':'PAUSAR';last=performance.now();accumulator=0;};
   $('pause').onclick=togglePause;
   const charge=()=>{if(paused)return;audio.unlock();game.chargeStart();if(game.charging)$('launch').classList.add('active');};
@@ -65,7 +67,7 @@ try {
     e.preventDefault();if(e.repeat)return;
     if(e.code==='KeyP'){togglePause();return;}if(paused||game.status!=='playing')return;
     if(e.code==='KeyN'){game.nudge(0,-1,1);return;}
-    if(e.code==='Space')charge();else{keys.add(e.code==='ArrowLeft'?'left':'right');updateInputs();audio.play('flipper');}
+    if(e.code==='Space')charge();else{audio.unlock();keys.add(e.code==='ArrowLeft'?'left':'right');updateInputs();audio.play('flipper');}
   });
   document.addEventListener('keyup',e=>{if(e.code==='Space'){e.preventDefault();release();}else if(['ArrowLeft','ArrowRight'].includes(e.code)){keys.delete(e.code==='ArrowLeft'?'left':'right');updateInputs();}});
   window.addEventListener('blur',()=>{clear();if(!paused&&game.status==='playing')togglePause();});
