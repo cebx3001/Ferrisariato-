@@ -149,3 +149,39 @@ test('Stalled balls are freed; persistent pinning returns to a safe playfield ar
  assert.equal(g.balls,3);
  assert.equal(g.stuckAttempts,0);
 });
+
+test('Seven distinct rear targets award one extra ball and 3000 bonus points',()=>{
+ const g=make();
+ for(const [i,o] of layout.targets.entries()){
+  place(g,o.x,o.y+.55,0,-5);step(g,.12);
+  assert.equal(g.targetsActivated.size,i+1,'Only different targets advance the seven-lamp goal');
+  assert.equal(g.balls,i===6?4:3,'Award the extra ball only on target seven');
+ }
+ assert.equal(g.targetBonusAwarded,true);
+ assert.equal(g.score,7*150+3000);
+ assert.equal(g.events.filter(e=>e.type==='target-bonus').length,1);
+ place(g,layout.targets[0].x,layout.targets[0].y+.55,0,-5);step(g,.2);
+ assert.equal(g.balls,4,'Repeat target contacts cannot farm extra balls');
+ assert.equal(g.events.filter(e=>e.type==='target-bonus').length,1);
+});
+test('Target lights progress across lives and reset on a fresh game',()=>{
+ const g=make(),o=layout.targets[0];
+ place(g,o.x,o.y+.55,0,-5);step(g,.12);
+ assert.ok(g.targetsActivated.has(o.id));
+ place(g,o.x,o.y+.55,0,-5);step(g,.2);
+ assert.equal(g.targetsActivated.size,1,'Hitting the same objective again does not add another lamp');
+ g.respawn();assert.ok(g.targetsActivated.has(o.id),'Target must stay activated after respawn');
+ g.start();assert.equal(g.targetsActivated.size,0);
+ assert.equal(g.targetBonusAwarded,false);assert.equal(g.balls,3);
+});
+test('Completion creates seven ordered chimes and travelling target light pulses',()=>{
+ const g=make();
+ for(const o of layout.targets){place(g,o.x,o.y+.55,0,-5);step(g,.12);}
+ assert.ok(g.bonusBannerUntil>g.elapsed);
+ step(g,1.25);
+ const notes=g.events.filter(e=>e.type==='bonus-note');
+ assert.deepEqual(notes.map(e=>e.index),[0,1,2,3,4,5,6]);
+ assert.equal(g.bonusSequence,null);
+ assert.equal(g.targetsActivated.size,7);
+ assert.equal(g.balls,4);
+});
