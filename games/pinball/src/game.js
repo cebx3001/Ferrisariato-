@@ -87,6 +87,7 @@ try {
     const seconds=Math.ceil(game.remaining);$('time').textContent=String(Math.floor(seconds/60)).padStart(2,'0')+':'+String(seconds%60).padStart(2,'0');
     $('balls').textContent='● '.repeat(Math.max(0,game.balls)).trim()||'—';$('balls').setAttribute('aria-label',game.balls+' bolas');
     $('charge').style.height=game.charge*100+'%';$('launch').disabled=game.status!=='playing'||game.launched||!!game.lossDelay||paused;
+    $('message').classList.toggle('bonus-active',game.status==='playing'&&game.elapsed<game.bonusBannerUntil);
     $('message').textContent=paused?'EN PAUSA · CONTINÚA CUANDO QUIERAS':game.elapsed<game.tiltUntil?'TILT · EXCESO DE SACUDIDAS':game.status==='ready'?'CONSTRUYE TU CASA CON TODO':game.status==='finished'?'¡GRACIAS POR JUGAR!':game.lossDelay?'BOLA PERDIDA · PREPARANDO LANZADOR':!game.launched?'MANTÉN Y SUELTA PARA LANZAR':game.elapsed<game.bonusBannerUntil?'¡SIETE OBJETIVOS! +3.000 PUNTOS · +1 BOLA':game.entered?`${game.targetsActivated.size}/7 OBJETIVOS ENCENDIDOS`:game.rampDirection<0?'LANZAMIENTO DÉBIL · CARGA MÁS FUERZA':game.travelState==='RAMP_TRAVEL'?'RECORRIENDO EL CANAL':'¡LANZAMIENTO!';
     const duration=performance.now()-begin;maxFrame=Math.max(maxFrame,duration);totalFrame+=duration;frameCount++;requestAnimationFrame(frame);
   }
