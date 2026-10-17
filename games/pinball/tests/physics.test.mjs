@@ -10,10 +10,17 @@ const make=()=>{const g=new PinballPhysics(b,layout);g.start();return g;};
 const step=(g,seconds)=>{for(let i=0;i<Math.ceil(seconds*120);i++)g.tick();};
 const place=(g,x,y,vx,vy)=>{g.travelState='PLAYFIELD';g.rampPose=null;g.launched=true;g.ball.SetActive(true);g.ball.SetPosition(new b.b2Vec2(x,y));g.ball.SetLinearVelocity(new b.b2Vec2(vx,vy));};
 const untilHit=(g,id)=>{for(let i=0;i<120&&!g.hits.has(id);i++)g.tick();assert.ok(g.hits.has(id),`No physical contact with ${id}`);};
-for(const power of [0,.25,.5,.75,1])test(`Real shooter lane enters the field: charge ${power}`,()=>{
+for(const power of [.7,.85,1])test(`Charged plunger completes the channel: power ${power}`,()=>{
   const g=make();g.chargeStart();step(g,power*1.2);g.chargeRelease();
-  step(g,4.5);assert.ok(g.events.some(e=>e.type==='entry'),'Ball must cross the real lane opening');
-  assert.ok(g.events.some(e=>e.type==='hit'),'Ball must reach an interactive fixture');
+  step(g,5);assert.ok(g.events.some(e=>e.type==='entry'),'Charged ball must reach the playfield');
+  assert.ok(g.events.some(e=>e.type==='hit'),'Charged ball must hit an interactive fixture');
+});
+for(const power of [0,.25,.5])test(`Weak plunger rolls back to launch lane: power ${power}`,()=>{
+  const g=make();g.chargeStart();step(g,power*1.2);g.chargeRelease();
+  step(g,7);assert.ok(g.events.some(e=>e.type==='weak-launch'),'Weak launch visibly stops on the channel');
+  assert.ok(!g.events.some(e=>e.type==='entry'),'Weak ball must not reach the bumpers');
+  assert.equal(g.launched,false,'The ball returns to the launcher without losing a life');
+  assert.equal(g.balls,3);
 });
 for(const o of layout.bumpers)test(`${o.id}: physical collision, rebound, score and light`,()=>{
   const g=make();place(g,o.x,o.y+o.radius+.4,0,-6);untilHit(g,o.id);
@@ -60,7 +67,7 @@ test('Playing for 60 seconds keeps bodies finite and bounded without stuck launc
 });
 
 test('Single ramp: physical sensor, monotonic travel, collision isolation and tangent handoff',()=>{
- const g=make();g.chargeStart();g.chargeRelease();let last=0,seen=false,exit=false;
+ const g=make();g.chargeStart();g.charge=1;g.chargeRelease();let last=0,seen=false,exit=false;
  for(let i=0;i<650;i++){
   g.tick();if(g.travelState==='RAMP_TRAVEL'){
    seen=true;assert.equal(g.ball.IsActive(),false);assert.equal(g.score,0);assert.ok(g.rampPose.distance>=last);
@@ -101,4 +108,43 @@ test('Reference flippers have a broad pivot and a narrower physical tip',()=>{
   assert.ok(inside(f.length,layout.flipperTipRadius-.02),'Nose retains its solid collision surface');
   assert.equal(inside(f.length,layout.flipperRadius-.02),false,'No invisible capsule-width contact around narrow nose');
  }
+});
+
+test('Physics varies: sling > main bumper > small tank, without identical rebound',()=>{
+ const g=make(),kinds=[
+  g.layout.slings[0],
+  g.layout.bumpers.find(o=>o.kind==='main'),
+  g.layout.bumpers.find(o=>o.kind==='tank')
+ ];
+ const speeds=kinds.map(o=>{
+  g.launched=true;g.ball.SetActive(true);
+  g.ball.SetPosition(new b.b2Vec2(o.x??3,o.y??11));
+  g.ball.SetLinearVelocity(new b.b2Vec2(0,0));
+  g.hit({...o,type:o.kick?'sling':'bumper',points:o.points??25});
+  return Math.hypot(g.ball.GetLinearVelocity().x,g.ball.GetLinearVelocity().y);
+ });
+ assert.ok(speeds[0]>speeds[1]&&speeds[1]>speeds[2],JSON.stringify(speeds));
+});
+test('Nudge displaces a playfield ball but not during guided ramp; repeated nudges cause TILT',()=>{
+ const g=make();place(g,4.75,11.4,0,0);
+ assert.equal(g.nudge(1,-1),true);
+ assert.ok(Math.hypot(g.ball.GetLinearVelocity().x,g.ball.GetLinearVelocity().y)>1);
+ g.travelState='RAMP_TRAVEL';assert.equal(g.nudge(),false);
+ g.travelState='PLAYFIELD';
+ for(let i=0;i<3;i++)assert.equal(g.nudge(0,-1),true);
+ assert.equal(g.nudge(0,-1),false);assert.equal(g.snapshot().tilted,true);
+ assert.equal(g.nudge(0,-1),false);
+});
+test('Stalled balls are freed; persistent pinning returns to a safe playfield area',()=>{
+ const g=make();place(g,4.75,11.3,0,0);
+ // Force repeated diagnostic scans at the same physical position to represent
+ // a trapped ball without simulating several seconds of collisions.
+ for(let attempt=0;attempt<3;attempt++){
+   g.ball.SetPosition(new b.b2Vec2(4.75,11.3));
+   g.stallOrigin={x:4.75,y:11.3};g.stallSeconds=2.99;
+   g.detectStuck(.02);
+ }
+ assert.ok(g.events.filter(e=>e.type==='unstuck').length>=3);
+ assert.equal(g.balls,3);
+ assert.equal(g.stuckAttempts,0);
 });
