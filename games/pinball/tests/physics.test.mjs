@@ -40,9 +40,10 @@ for(const o of layout.slings)test(`${o.id}: active triangular rebound`,()=>{
 for(const side of ['left','right'])test(`${side}: motor sweeps, hits the ball and returns`,()=>{
   const g=make(),f=g.flippers.find(x=>x.id===side);step(g,.05);
   const x=f.x+Math.cos(f.rest)*.9,y=f.y+Math.sin(f.rest)*.9-.24;
-  place(g,x,y,0,0);g.setFlipper(side,true);step(g,.13);
+  place(g,x,y,0,0);g.setFlipper(side,true);step(g,.05);
+  assert.ok(g.ball.GetLinearVelocity().y<-2,'Motorized fixture must immediately transfer upward velocity');
+  step(g,.08);
   assert.ok(Math.abs(f.body.GetAngle()-f.active)<.09);
-  assert.ok(g.ball.GetLinearVelocity().y<-2,'Motorized fixture must transfer upward velocity');
   const other=g.flippers.find(x=>x.id!==side);assert.ok(Math.abs(other.body.GetAngle()-other.rest)<.06);
   g.setFlipper(side,false);step(g,.15);assert.ok(Math.abs(f.body.GetAngle()-f.rest)<.08);
 });
@@ -118,7 +119,7 @@ test('Physics varies: sling > main bumper > small tank, without identical reboun
  ];
  const speeds=kinds.map(o=>{
   g.launched=true;g.ball.SetActive(true);
-  g.ball.SetPosition(new b.b2Vec2(o.x??3,o.y??11));
+  g.ball.SetPosition(new b.b2Vec2(o.x!=null?o.x+.3:3,o.y??11));
   g.ball.SetLinearVelocity(new b.b2Vec2(0,0));
   g.hit({...o,type:o.kick?'sling':'bumper',points:o.points??25});
   return Math.hypot(g.ball.GetLinearVelocity().x,g.ball.GetLinearVelocity().y);
