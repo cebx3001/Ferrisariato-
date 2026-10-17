@@ -19,6 +19,9 @@ export class PinballPhysics {
     this.nudgeHistory=[];this.tiltUntil=0;
     this.inputs.left=this.inputs.right=false; this.events=[]; this.cooldowns=new Map();
     this.hits=new Map(); this.lights=new Map(); this.pending=[]; this.fixtures=new Map();
+    // Each different rear target stays activated across balls for this match.
+    this.targetsActivated=new Set();this.targetBonusAwarded=false;
+    this.bonusSequence=null;this.bonusBannerUntil=0;
     this.ground=this.body(0,0);
     this.layout.walls.forEach((line,i)=>line.slice(1).forEach((p,j)=>this.edge(line[j],p,`wall-${i}-${j}`)));
     for(const o of this.layout.posts||[])this.fixture(this.body(o.x,o.y),new b.b2CircleShape(o.radius),{...o,type:'post'},.55);
@@ -93,6 +96,7 @@ export class PinballPhysics {
     this.elapsed+=dt;this.remaining=Math.max(0,this.layout.duration-this.elapsed);
     if(this.remaining===0){this.finish('time');return;}
     if(this.charging)this.charge=Math.min(1,this.charge+dt/1.2);
+    this.advanceTargetBonus();
     for(const [i,f] of this.flippers.entries()){
       const pressed=this.inputs[f.id]&&this.elapsed>=this.tiltUntil;
       f.joint.SetMotorSpeed((pressed?-1:1)*(i?-1:1)*(pressed?34:40));
@@ -189,10 +193,32 @@ export class PinballPhysics {
     }
     this.stallSeconds=0;this.stallOrigin=null;this.events.push({type:'unstuck'});
   }
+  advanceTargetBonus(){
+    const seq=this.bonusSequence;
+    if(!seq)return;
+    // Follow game time rather than browser timers, so pause also pauses the show.
+    while(seq.step<this.layout.targets.length&&this.elapsed>=seq.start+seq.step*.15){
+      const step=seq.step++,target=this.layout.targets[step];
+      this.lights.set(target.id,this.elapsed+.22);
+      this.events.push({type:'bonus-note',index:step,id:target.id});
+    }
+    if(seq.step>=this.layout.targets.length)this.bonusSequence=null;
+  }
   hit(o){
     if((this.cooldowns.get(o.id)||-1)>this.elapsed||!this.launched)return;
     this.cooldowns.set(o.id,this.elapsed+.13);this.lights.set(o.id,this.elapsed+.2);
     this.hits.set(o.id,(this.hits.get(o.id)||0)+1);this.score+=o.points;
+    if(o.type==='target'&&!this.targetBonusAwarded&&!this.targetsActivated.has(o.id)){
+      this.targetsActivated.add(o.id);
+      this.events.push({type:'target-activated',id:o.id,count:this.targetsActivated.size});
+      if(this.targetsActivated.size===this.layout.targets.length){
+        this.targetBonusAwarded=true;
+        this.balls+=1;this.score+=3000;
+        this.bonusSequence={start:this.elapsed,step:0};
+        this.bonusBannerUntil=this.elapsed+3.2;
+        this.events.push({type:'target-bonus',points:3000,balls:1});
+      }
+    }
     const p=this.ball.GetPosition(),v=this.ball.GetLinearVelocity();
     let dx,dy;
     if(o.type==='bumper'){dx=p.x-o.x;dy=p.y-o.y;}
@@ -208,5 +234,5 @@ export class PinballPhysics {
     this.stallOrigin=null;this.stallSeconds=0;this.stuckAttempts=0;this.tiltUntil=0;this.nudgeHistory=[];
     this.pending=[];this.ball.SetActive(false);this.ball.SetPosition(new this.b.b2Vec2(...this.layout.spawn));this.ball.SetLinearVelocity(new this.b.b2Vec2(0,0));this.ball.SetAngularVelocity(0);this.launched=false;this.entered=false;this.charge=0;this.charging=false;}
   finish(reason){this.travelState='FINISHED';this.rampPose=null;this.status='finished';this.ball.SetActive(false);this.clearInputs();this.events.push({type:'finish',reason});}
-  snapshot(){const p=this.ball.GetPosition(),v=this.ball.GetLinearVelocity();return {travelState:this.travelState,ramp:this.rampPose,ballActive:this.ball.IsActive(),status:this.status,score:this.score,remaining:this.remaining,balls:this.balls,charge:this.charge,launched:this.launched,entered:this.entered,launchPower:this.launchPower,rampDirection:this.rampDirection,tilted:this.elapsed<this.tiltUntil,stuckAttempts:this.stuckAttempts,position:{x:p.x,y:p.y},velocity:{x:v.x,y:v.y},flippers:this.flippers.map(f=>({id:f.id,angle:f.body.GetAngle()})),hits:Object.fromEntries(this.hits),lights:Object.fromEntries([...this.lights].filter(([,t])=>t>this.elapsed))};}
+  snapshot(){const p=this.ball.GetPosition(),v=this.ball.GetLinearVelocity();return {travelState:this.travelState,ramp:this.rampPose,ballActive:this.ball.IsActive(),status:this.status,score:this.score,remaining:this.remaining,balls:this.balls,charge:this.charge,launched:this.launched,entered:this.entered,launchPower:this.launchPower,rampDirection:this.rampDirection,tilted:this.elapsed<this.tiltUntil,stuckAttempts:this.stuckAttempts,targetsActivated:[...this.targetsActivated],targetBonusAwarded:this.targetBonusAwarded,bonusBannerUntil:this.bonusBannerUntil,position:{x:p.x,y:p.y},velocity:{x:v.x,y:v.y},flippers:this.flippers.map(f=>({id:f.id,angle:f.body.GetAngle()})),hits:Object.fromEntries(this.hits),lights:Object.fromEntries([...this.lights].filter(([,t])=>t>this.elapsed))};}
 }
