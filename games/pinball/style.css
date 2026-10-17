@@ -25,3 +25,15 @@
 .message{top:auto;bottom:1.4%;font-size:8px;left:5%;right:5%}
 @media(max-width:760px){.machine{width:min(98vw,calc((100svh - 82px)*.666667))}.message{font-size:6px}}
 @media(max-height:600px) and (min-width:600px){.machine{width:calc((100svh - 82px)*.666667)}}
+
+/* Visible only for the short seven-target extra-ball celebration. */
+.message.bonus-active{top:2%;left:4%;right:4%;padding:9px 5px;z-index:3;
+  font-size:clamp(11px,1.2vw,15px);color:#fff4b8;
+  background:linear-gradient(90deg,#0b3978dd,#003068ee,#0b3978dd);
+  border:1px solid #fbd052c9;border-radius:4px;
+  box-shadow:0 0 22px #f7bd2e66, inset 0 0 13px #ffe37f24;
+  text-shadow:0 0 8px #ffce5c,0 0 3px #fff;
+  animation:target-bonus-pulse .32s ease-in-out infinite alternate;
+}
+@keyframes target-bonus-pulse{from{filter:brightness(.9)}to{filter:brightness(1.4)}}
+@media(prefers-reduced-motion:reduce){.message.bonus-active{animation:none}}
