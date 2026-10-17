@@ -37,3 +37,11 @@
 }
 @keyframes target-bonus-pulse{from{filter:brightness(.9)}to{filter:brightness(1.4)}}
 @media(prefers-reduced-motion:reduce){.message.bonus-active{animation:none}}
+
+/* Long-pressing mobile game controls must never select labels or open copy menus. */
+.machine button,.machine button *,.flipper-label,.flipper-label *{
+  -webkit-user-select:none;
+  user-select:none;
+  -webkit-touch-callout:none;
+  -webkit-tap-highlight-color:transparent;
+}
