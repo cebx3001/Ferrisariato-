@@ -43,6 +43,18 @@ liberar automáticamente y, tras intentos fallidos, se recoloca en una zona
 segura sin descontar una vida. La función de sensores necesita probarse
 también en teléfonos físicos.
 
+## Bono de los siete objetivos
+
+Cada uno de los siete objetivos posteriores se enciende permanentemente al
+ser golpeado por primera vez en la partida. Los objetivos diferentes se
+acumulan incluso si el jugador pierde una bola. Al completar el séptimo,
+el juego entrega **3.000 puntos y una bola adicional**, reproduce siete notas
+musicales ascendentes, ejecuta destellos secuenciales en los siete indicadores
+y muestra brevemente el mensaje del premio. Un objetivo repetido sigue
+sumando sus puntos normales, pero no cuenta de nuevo para la colección.
+La bola extra se concede **una sola vez por partida**; reiniciar borra la
+colección y habilita nuevamente el premio.
+
 Tres bolas y 120 segundos. Bumper principal: 100 puntos; tanque: 75;
 objetivo: 150; slingshot: 25. Luces de impacto de 200 ms y sonidos sintetizados
 con variaciones por elemento. La casa es escenografía permanente.
