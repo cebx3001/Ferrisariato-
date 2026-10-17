@@ -185,3 +185,18 @@ test('Completion creates seven ordered chimes and travelling target light pulses
  assert.equal(g.targetsActivated.size,7);
  assert.equal(g.balls,4);
 });
+
+test('Flipper jams slide free on both sides without removing any physical components',()=>{
+ for(const side of ['left','right'])for(const held of [false,true])for(const offset of [0,1.55]){
+  const g=make(),f=g.flippers.find(o=>o.id===side);
+  assert.equal((()=>{let n=0;for(let fixture=f.body.GetFixtureList();fixture;fixture=fixture.GetNext())n++;return n;})(),3,'All three original flipper fixtures are retained');
+  g.setFlipper(side,held);step(g,.17);
+  const angle=held?f.active:f.rest;
+  const start={x:f.x+offset*Math.cos(angle),y:f.y+offset*Math.sin(angle)-.4};
+  place(g,start.x,start.y,0,0);
+  step(g,1.5);
+  const p=g.ball.GetPosition();
+  assert.ok(Math.hypot(p.x-start.x,p.y-start.y)>.35,
+    `Ball must slide free from ${side} ${held?'raised':'resting'} flipper at offset ${offset}`);
+ }
+});
