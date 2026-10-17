@@ -49,7 +49,7 @@ export class PinballPhysics {
       }
       const def=new b.b2RevoluteJointDef();def.Initialize(this.ground,body,new b.b2Vec2(o.x,o.y));
       def.enableLimit=true;def.lowerAngle=Math.min(0,o.active-o.rest);def.upperAngle=Math.max(0,o.active-o.rest);
-      def.enableMotor=true;def.maxMotorTorque=16000;def.motorSpeed=i? -48:48;
+      def.enableMotor=true;def.maxMotorTorque=12000;def.motorSpeed=i? -34:34;
       return {body,joint:this.world.CreateJoint(def),...o};
     });
     this.ball=this.body(...this.layout.spawn,true);
@@ -95,7 +95,7 @@ export class PinballPhysics {
     if(this.charging)this.charge=Math.min(1,this.charge+dt/1.2);
     for(const [i,f] of this.flippers.entries()){
       const pressed=this.inputs[f.id]&&this.elapsed>=this.tiltUntil;
-      f.joint.SetMotorSpeed((pressed?-1:1)*(i?-1:1)*(pressed?48:42));
+      f.joint.SetMotorSpeed((pressed?-1:1)*(i?-1:1)*(pressed?34:40));
     }
     if(this.lossDelay){this.lossDelay=Math.max(0,this.lossDelay-dt);if(!this.lossDelay)this.respawn();}
     this.world.Step(dt,10,5);
@@ -104,7 +104,7 @@ export class PinballPhysics {
     const p=this.ball.GetPosition(),v=this.ball.GetLinearVelocity();
     if(this.launched){
       if(!this.layout.ramp&&!this.entered&&p.x<8.45&&p.y<4.0){this.entered=true;this.events.push({type:'entry'});}
-      const speed=Math.hypot(v.x,v.y);if(speed>24)this.ball.SetLinearVelocity(new this.b.b2Vec2(v.x*24/speed,v.y*24/speed));
+      const speed=Math.hypot(v.x,v.y);if(speed>22)this.ball.SetLinearVelocity(new this.b.b2Vec2(v.x*22/speed,v.y*22/speed));
       if(p.y>16.5){this.balls--;this.ball.SetActive(false);this.launched=false;this.clearInputs();this.events.push({type:'lost'});if(!this.balls)this.finish('balls');else this.lossDelay=.85;}
       // A ball that returns down the real shooter lane may be relaunched.
       else if(p.x>8.95&&p.y>14.45&&Math.abs(v.y)<1&&this.elapsed>(this.lastReturn||0)+.7){this.respawn();this.events.push({type:'return'});this.lastReturn=this.elapsed;}
@@ -161,7 +161,7 @@ export class PinballPhysics {
     const v=this.ball.GetLinearVelocity(),mag=Math.hypot(dx,dy)||1;
     const kick=Math.max(1,Math.min(4.5,2.5*strength));
     const vx=v.x+dx/mag*kick,vy=v.y+dy/mag*kick;
-    const speed=Math.hypot(vx,vy),scale=speed>24?24/speed:1;
+    const speed=Math.hypot(vx,vy),scale=speed>22?22/speed:1;
     this.ball.SetLinearVelocity(new this.b.b2Vec2(vx*scale,vy*scale));
     this.stallSeconds=0;this.stallOrigin=null;
     this.events.push({type:'nudge'});return true;
