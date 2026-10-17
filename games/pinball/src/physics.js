@@ -24,7 +24,7 @@ export class PinballPhysics {
     for(const o of this.layout.posts||[])this.fixture(this.body(o.x,o.y),new b.b2CircleShape(o.radius),{...o,type:'post'},.55);
     for(const o of this.layout.bumpers) {
       const body=this.body(o.x,o.y); const shape=new b.b2CircleShape(o.radius);
-      this.fixture(body,shape,{...o,type:'bumper'},0.9);
+      this.fixture(body,shape,{...o,type:'bumper'},o.kind==='tank'?.43:.68);
     }
     for(const o of this.layout.targets) {
       const body=this.body(o.x,o.y); const shape=new b.b2PolygonShape();shape.SetAsBox(.31,.17);
@@ -33,7 +33,7 @@ export class PinballPhysics {
     for(const o of this.layout.slings) {
       const body=this.body(0,0); const shape=new b.b2PolygonShape();
       shape.Set(o.vertices.map(p=>new b.b2Vec2(...p)),o.vertices.length);
-      this.fixture(body,shape,{...o,type:'sling',points:25},.9);
+      this.fixture(body,shape,{...o,type:'sling',points:25},.82);
     }
     if(this.layout.ramp){const shape=new b.b2PolygonShape();shape.SetAsBox(.32,.08);const sensor=this.fixture(this.body(...this.layout.ramp.sensor),shape,{id:'ramp-entry',type:'ramp-entry'});sensor.SetSensor(true);}
     this.flippers=this.layout.flippers.map((o,i)=> {
@@ -53,7 +53,7 @@ export class PinballPhysics {
       return {body,joint:this.world.CreateJoint(def),...o};
     });
     this.ball=this.body(...this.layout.spawn,true);
-    this.ball.SetBullet(true);this.ball.SetLinearDamping(.045);
+    this.ball.SetBullet(true);this.ball.SetLinearDamping(.12);
     const ballFixture=new b.b2FixtureDef();ballFixture.shape=new b.b2CircleShape(this.layout.ballRadius);
     ballFixture.density=1;ballFixture.restitution=.35;ballFixture.friction=.08;
     ballFixture.filter.categoryBits=1;ballFixture.filter.maskBits=2;
@@ -104,7 +104,7 @@ export class PinballPhysics {
     const p=this.ball.GetPosition(),v=this.ball.GetLinearVelocity();
     if(this.launched){
       if(!this.layout.ramp&&!this.entered&&p.x<8.45&&p.y<4.0){this.entered=true;this.events.push({type:'entry'});}
-      const speed=Math.hypot(v.x,v.y);if(speed>32)this.ball.SetLinearVelocity(new this.b.b2Vec2(v.x*32/speed,v.y*32/speed));
+      const speed=Math.hypot(v.x,v.y);if(speed>24)this.ball.SetLinearVelocity(new this.b.b2Vec2(v.x*24/speed,v.y*24/speed));
       if(p.y>16.5){this.balls--;this.ball.SetActive(false);this.launched=false;this.clearInputs();this.events.push({type:'lost'});if(!this.balls)this.finish('balls');else this.lossDelay=.85;}
       // A ball that returns down the real shooter lane may be relaunched.
       else if(p.x>8.95&&p.y>14.45&&Math.abs(v.y)<1&&this.elapsed>(this.lastReturn||0)+.7){this.respawn();this.events.push({type:'return'});this.lastReturn=this.elapsed;}
@@ -161,7 +161,7 @@ export class PinballPhysics {
     const v=this.ball.GetLinearVelocity(),mag=Math.hypot(dx,dy)||1;
     const kick=Math.max(1,Math.min(4.5,2.5*strength));
     const vx=v.x+dx/mag*kick,vy=v.y+dy/mag*kick;
-    const speed=Math.hypot(vx,vy),scale=speed>32?32/speed:1;
+    const speed=Math.hypot(vx,vy),scale=speed>24?24/speed:1;
     this.ball.SetLinearVelocity(new this.b.b2Vec2(vx*scale,vy*scale));
     this.stallSeconds=0;this.stallOrigin=null;
     this.events.push({type:'nudge'});return true;
@@ -198,7 +198,9 @@ export class PinballPhysics {
     if(o.type==='bumper'){dx=p.x-o.x;dy=p.y-o.y;}
     else if(o.type==='sling'){[dx,dy]=o.kick;}
     else {dx=p.x-o.x;dy=p.y<o.y?-1:1;}
-    const n=Math.hypot(dx,dy)||1,k=o.type==='bumper'?8:o.type==='sling'?10:3;
+    // Mechanisms transfer different energy: slings strongest, large bumpers
+    // medium, small tank bumpers soft. Avoid a uniform, frantic rebound feel.
+    const n=Math.hypot(dx,dy)||1,k=o.type==='sling'?10.5:o.type==='bumper'?(o.kind==='tank'?2.3:5.3):1.8;
     this.ball.SetLinearVelocity(new this.b.b2Vec2(v.x+dx/n*k,v.y+dy/n*k));
     this.events.push({type:'hit',id:o.id,kind:o.type,points:o.points});
   }
