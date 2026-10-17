@@ -1,6 +1,6 @@
 import {PinballPhysics} from './physics.js?v=reference-5.7';
 import {Renderer} from './renderer.js?v=reference-5.7';
-import {PinballAudio} from './audio.js';
+import {PinballAudio} from './audio.js?v=reference-5.7';
 const BUILD='reference-5.7';
 const $=id=>document.getElementById(id),audio=new PinballAudio();
 const image=src=>new Promise((resolve,reject)=>{const i=new Image();i.onload=()=>resolve(i);i.onerror=()=>reject(Error('No se pudo cargar '+src));i.src=src+'?v='+BUILD;});
