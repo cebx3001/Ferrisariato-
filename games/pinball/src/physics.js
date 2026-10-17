@@ -15,7 +15,7 @@ export class PinballPhysics {
     this.travelState='SHOOTER';this.rampPose=null;this.rampDistance=0;this.launchPower=0;
     this.rampDirection=1;this.rampMaxDistance=0;this.rampSpeed=0;
     this.charging=false; this.launched=false; this.entered=false; this.lossDelay=0;
-    this.stallOrigin=null;this.stallSeconds=0;this.stuckAttempts=0;
+    this.stallOrigin=null;this.stallSeconds=0;this.stuckAttempts=0;this.flipperCatch=null;
     this.nudgeHistory=[];this.tiltUntil=0;
     this.inputs.left=this.inputs.right=false; this.events=[]; this.cooldowns=new Map();
     this.hits=new Map(); this.lights=new Map(); this.pending=[]; this.fixtures=new Map();
@@ -113,6 +113,7 @@ export class PinballPhysics {
       // A ball that returns down the real shooter lane may be relaunched.
       else if(p.x>8.95&&p.y>14.45&&Math.abs(v.y)<1&&this.elapsed>(this.lastReturn||0)+.7){this.respawn();this.events.push({type:'return'});this.lastReturn=this.elapsed;}
     }
+    this.preventFlipperCatch(dt);
     this.detectStuck(dt);
   }
   enterRamp(){
@@ -150,6 +151,35 @@ export class PinballPhysics {
       this.ball.SetActive(true);this.ball.SetLinearVelocity(new this.b.b2Vec2(dx/n*exitSpeed,dy/n*exitSpeed));
       this.ball.SetAngularVelocity(exitSpeed/this.layout.ballRadius);this.rampPose=null;
       this.events.push({type:'ramp-exit'},{type:'entry'});
+    }
+  }
+  // Free a ball resting unnaturally against the flipper/guide joint.
+  // All three existing flipper fixtures, pivots and geometry remain untouched.
+  preventFlipperCatch(dt){
+    if(this.status!=='playing'||this.travelState!=='PLAYFIELD'||!this.launched||!this.ball.IsActive()){
+      this.flipperCatch=null;return;
+    }
+    let side=null;
+    for(let node=this.ball.GetContactList();node;node=node.next){
+      const contact=node.contact;if(!contact.IsTouching())continue;
+      const a=contact.GetFixtureA().GetUserData(),other=contact.GetFixtureB().GetUserData();
+      const flipper=a?.type==='flipper'?a:other?.type==='flipper'?other:null;
+      if(flipper){side=flipper.id;break;}
+    }
+    const velocity=this.ball.GetLinearVelocity();
+    if(!side||Math.hypot(velocity.x,velocity.y)>.8){
+      this.flipperCatch=null;return;
+    }
+    if(!this.flipperCatch||this.flipperCatch.side!==side)
+      this.flipperCatch={side,duration:0};
+    this.flipperCatch.duration+=dt;
+    if(this.flipperCatch.duration<.26)return;
+    const inward=side==='left'?1:-1;
+    // Small, smooth inward glide; prevent permanent pinching against a pivot.
+    this.ball.SetLinearVelocity(new this.b.b2Vec2(inward*2.4,-2.5));
+    if(this.flipperCatch.duration>.5){
+      const p=this.ball.GetPosition();
+      this.ball.SetPosition(new this.b.b2Vec2(p.x+inward*.03,p.y-.015));
     }
   }
   // Genuine movement of the physical Box2D ball. Never nudges an animated ramp ball.
@@ -231,7 +261,7 @@ export class PinballPhysics {
     this.events.push({type:'hit',id:o.id,kind:o.type,points:o.points});
   }
   respawn(){this.travelState='SHOOTER';this.rampPose=null;this.rampDistance=0;this.rampDirection=1;this.rampMaxDistance=0;
-    this.stallOrigin=null;this.stallSeconds=0;this.stuckAttempts=0;this.tiltUntil=0;this.nudgeHistory=[];
+    this.stallOrigin=null;this.stallSeconds=0;this.stuckAttempts=0;this.flipperCatch=null;this.tiltUntil=0;this.nudgeHistory=[];
     this.pending=[];this.ball.SetActive(false);this.ball.SetPosition(new this.b.b2Vec2(...this.layout.spawn));this.ball.SetLinearVelocity(new this.b.b2Vec2(0,0));this.ball.SetAngularVelocity(0);this.launched=false;this.entered=false;this.charge=0;this.charging=false;}
   finish(reason){this.travelState='FINISHED';this.rampPose=null;this.status='finished';this.ball.SetActive(false);this.clearInputs();this.events.push({type:'finish',reason});}
   snapshot(){const p=this.ball.GetPosition(),v=this.ball.GetLinearVelocity();return {travelState:this.travelState,ramp:this.rampPose,ballActive:this.ball.IsActive(),status:this.status,score:this.score,remaining:this.remaining,balls:this.balls,charge:this.charge,launched:this.launched,entered:this.entered,launchPower:this.launchPower,rampDirection:this.rampDirection,tilted:this.elapsed<this.tiltUntil,stuckAttempts:this.stuckAttempts,targetsActivated:[...this.targetsActivated],targetBonusAwarded:this.targetBonusAwarded,bonusBannerUntil:this.bonusBannerUntil,position:{x:p.x,y:p.y},velocity:{x:v.x,y:v.y},flippers:this.flippers.map(f=>({id:f.id,angle:f.body.GetAngle()})),hits:Object.fromEntries(this.hits),lights:Object.fromEntries([...this.lights].filter(([,t])=>t>this.elapsed))};}
