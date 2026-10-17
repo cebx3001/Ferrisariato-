@@ -25,6 +25,23 @@ El audio se habilita con la primera interacción del usuario.
 | Lanzador | Mantener espacio y soltar | Mantener el botón LANZAR y soltar |
 | Pausa | Botón PAUSAR o P | Botón PAUSAR |
 | Nueva partida | INICIAR / REINICIAR | INICIAR / REINICIAR |
+| Empujar la bola (Nudge) | N | Sacudida breve del teléfono |
+
+La carga del lanzador es progresiva: una pulsación breve produce un tiro
+insuficiente, la bola sube parcialmente por el canal y retorna al lanzador sin
+perder una vida. Mantener presionado aproximadamente 0,75 segundos o más
+permite completar el canal; a mayor carga, mayor velocidad de salida.
+Los flippers responden inmediatamente a teclado o toque.
+
+Los slingshots producen el impulso mayor, los bumpers principales uno
+intermedio y los tanques pequeños uno menor. La velocidad máxima del campo
+está limitada para evitar rebotes erráticos. En móviles compatibles, una
+sacudida breve (acelerómetro, con permiso cuando corresponda) da un impulso
+controlado a la bola. Cinco sacudidas en cuatro segundos activan un TILT
+temporal. Si una bola queda inmóvil durante tres segundos, se intenta
+liberar automáticamente y, tras intentos fallidos, se recoloca en una zona
+segura sin descontar una vida. La función de sensores necesita probarse
+también en teléfonos físicos.
 
 Tres bolas y 120 segundos. Bumper principal: 100 puntos; tanque: 75;
 objetivo: 150; slingshot: 25. Luces de impacto de 200 ms y sonidos sintetizados
