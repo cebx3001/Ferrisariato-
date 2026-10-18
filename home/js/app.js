@@ -3,7 +3,7 @@ const $=s=>document.getElementById(s), storeKey='ferrisariato-home-saved-v1';
 let viewer=null,engineReady=false,selected=PRODUCTS[0],saved=new Set(),mode='studio',modelPlaced=true,moving=false,rotation=0,scale=1;let toastTimer=0;
 try{saved=new Set(JSON.parse(localStorage.getItem(storeKey)||'[]').filter(id=>PRODUCTS.some(p=>p.id===id)));}catch{}
 
-// Only the verified patio set remains in the public HOME catalog.
+// Three original furniture models share the current PlayCanvas and WebAR viewer.
 const MOCKUP=PRODUCTS.every(p=>!p.modelReady);
 function updateConcept(){
  const root=$('viewer'),photo=$('concept-photo');
