@@ -29,8 +29,8 @@ export async function requestXRPermissions(){
 }
 /** One XR Engine tracking system for each app: no second competing camera. */
 export class XR8Tracking{
- constructor({app,camera,canvas,onStatus=()=>{},onEnd=()=>{},onHit=()=>{}}){
-  Object.assign(this,{app,camera,canvas,onStatus,onEnd,onHit});
+ constructor({app,camera,canvas,onStatus=()=>{},onEnd=()=>{},onHit=()=>{},onLighting=()=>{}}){
+  Object.assign(this,{app,camera,canvas,onStatus,onEnd,onHit,onLighting});
   this.active=false;this.ready=false;this.hit=null;this.hitTime=0;this.placed=false;this.position=null;
   this.ySamples=[];this.floorY=null;this.rejected=0;this.frames=0;this.valid=0;
   this._update=()=>this.update();
@@ -45,7 +45,7 @@ export class XR8Tracking{
   this.xr=xr;this.hit=null;this.placed=false;this.ready=false;this.position=null;this.floorY=null;
   this.ySamples=[];this.rejected=0;this.frames=0;this.valid=0;
   this.camera.setPosition(0,2,0); // Same initial tracking coordinate origin as Gaussian-AR.
-  xr.XrController.configure({disableWorldTracking:false,scale:'responsive'});
+  xr.XrController.configure({disableWorldTracking:false,scale:'responsive',enableLighting:true});
   const that=this;
   const modules=[{name:'ferrisariato-xr8',onUpdate(e){that.onFrame(e);},onException(err){that.onStatus('8th Wall: '+(err?.message||err),true);},onDeviceIncompatible(){that.onStatus('Este dispositivo no es compatible con XR Engine.',true);},onCameraStatusChange(e){if(e.status==='failed')that.onStatus('No se pudo iniciar la cámara.',true);}}];
   this.active=true;this.app.on('update',this._update);
@@ -55,6 +55,8 @@ export class XR8Tracking{
  onFrame(frame){
   if(!this.active||!frame?.processCpuResult?.reality)return;
   this.valid++;this.ready=true;
+  // Keep adapting brightness after placing the model.
+  if(frame.processCpuResult.reality.lighting)this.onLighting(frame.processCpuResult.reality.lighting);
   if(this.placed)return;
   let hits=[];
   try{hits=this.xr.XrController.hitTest(.5,.5,[])||[];}catch{return;}
