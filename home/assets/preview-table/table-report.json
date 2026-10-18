@@ -1,0 +1,13 @@
+{
+  "mesh_count": 10,
+  "materials": {
+    "wood": 5,
+    "metal": 5
+  },
+  "dimensions_w_h_d_m": [
+    2.0645,
+    0.966,
+    2.4215
+  ],
+  "bytes": 7662048
+}
