@@ -1,0 +1,46 @@
+{
+  "source": "original.blend",
+  "model": "Poltrona PL 461",
+  "mesh_count": 5,
+  "source_materials": [
+    [
+      "Cube",
+      "Madeira gen\u00e9rica",
+      "wood"
+    ],
+    [
+      "Cube.001",
+      "Madeira gen\u00e9rica",
+      "wood"
+    ],
+    [
+      "Plane",
+      "Material.003",
+      "wicker"
+    ],
+    [
+      "Plane.001",
+      "Material.002",
+      "cushion"
+    ],
+    [
+      "Plane.002",
+      "Madeira gen\u00e9rica",
+      "wood"
+    ]
+  ],
+  "dimensions_m": [
+    1.05,
+    0.7285,
+    0.7001
+  ],
+  "glb_bytes": 2680696,
+  "textures": [
+    "ratten_graphite_color.png",
+    "ratten_graphite_normal.png",
+    "cushion_slate_blue_color.png",
+    "cushion_slate_blue_normal.png",
+    "legs_dark_wood_color.png",
+    "legs_dark_wood_normal.png"
+  ]
+}
