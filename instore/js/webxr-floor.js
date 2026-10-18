@@ -12,10 +12,36 @@ const MATERIALS=[
 ];
 const byId=id=>document.getElementById(id);
 const easing=t=>1-Math.pow(1-Math.min(1,Math.max(0,t)),2.1);
+// Per-fragment ARCore/WebXR depth occlusion. No object-classification model required.
+const floorVertexGLSL="\nattribute vec3 aPosition;\nattribute vec2 aUv0;\nuniform mat4 matrix_model;\nuniform mat4 matrix_viewProjection;\nuniform mat4 matrix_view;\nvarying highp vec2 vUv;\nvarying highp float vCameraDepth;\nvoid main(void){\n vec4 world=matrix_model*vec4(aPosition,1.0);\n vUv=aUv0;\n vCameraDepth=-(matrix_view*world).z;\n gl_Position=matrix_viewProjection*world;\n}";
+const floorFragmentGLSL="\nprecision highp float;\nvarying highp vec2 vUv;\nvarying highp float vCameraDepth;\nuniform vec4 screen_size;\nuniform sampler2D uFloorMap;\nuniform sampler2D uRevealMask;\nuniform sampler2D depthMap;\nuniform mat4 matrix_depth_uv;\nuniform vec2 uFloorTiling;\nuniform vec3 uLightTint;\nuniform float depth_to_meters;\nuniform float uDepthFloat;\nuniform float uDepthRequired;\nuniform float uDepthReady;\nuniform float uReveal;\nvoid main(void){\n if(uDepthRequired>0.5){\n  if(uDepthReady<0.5)discard;\n  vec2 scr=gl_FragCoord.xy*screen_size.zw;\n  vec2 uv=(matrix_depth_uv*vec4(scr.x,1.0-scr.y,0.0,1.0)).xy;\n  if(uv.x<=0.0||uv.x>=1.0||uv.y<=0.0||uv.y>=1.0)discard;\n  vec4 d=texture2D(depthMap,uv);\n  float rawDepth=uDepthFloat>0.5?d.r:dot(d.ra,vec2(255.0,65280.0));\n  float realDepth=rawDepth*depth_to_meters;\n  if(realDepth<0.09||realDepth>15.0||vCameraDepth<=0.0)discard;\n  // Keep nearer tables, plants, chairs and shelves in front of the virtual floor.\n  float tolerance=0.035+vCameraDepth*0.016;\n  if(realDepth+tolerance<vCameraDepth)discard;\n }\n vec4 col=texture2D(uFloorMap,vUv*uFloorTiling);\n float wave=uReveal>0.5?texture2D(uRevealMask,vUv).r:1.0;\n if(wave<0.008)discard;\n gl_FragColor=vec4(col.rgb*uLightTint,col.a*wave);\n}";
+
+function makeOccludedFloorMaterial(reveal){
+ const m=new pc.ShaderMaterial({
+  uniqueName:reveal?'FerrisariatoDepthReveal2026':'FerrisariatoDepthBase2026',
+  attributes:{aPosition:pc.SEMANTIC_POSITION,aUv0:pc.SEMANTIC_TEXCOORD0},
+  vertexGLSL:floorVertexGLSL,fragmentGLSL:floorFragmentGLSL
+ });
+ m.cull=pc.CULLFACE_NONE;
+ m.depthWrite=!reveal;
+ m.blendType=reveal?pc.BLEND_NORMAL:pc.BLEND_NONE;
+ m.setParameter('uDepthRequired',0);
+ m.setParameter('uDepthReady',0);
+ m.setParameter('uDepthFloat',0);
+ m.setParameter('depth_to_meters',1);
+ m.setParameter('matrix_depth_uv',new pc.Mat4().data);
+ m.setParameter('uReveal',reveal?1:0);
+ m.setParameter('uLightTint',new Float32Array([1,1,1]));
+ m.setParameter('uFloorTiling',new Float32Array([2,2]));
+ m.update();
+ return m;
+}
+
+
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 function loadImage(url){return new Promise((resolve,reject)=>{const i=new Image();i.onload=()=>resolve(i);i.onerror=()=>reject(Error('Falta textura '+url));i.src=url;});}
 export class FloorWebXR {
- constructor(){this.isReady=false;this.supported=false;this.active=false;this.placed=false;this.hit=null;this.hitResult=null;this.hitSource=null;this.anchor=null;this.materialIndex=0;this.width=2.4;this.depth=3;this.radius=0;this.timer=0;this.revealing=false;this.canvas=byId('xr-canvas');this.overlay=byId('xr-overlay');this.status=byId('xr-status');this.action=byId('xr-action');this.message=byId('xr-step-message');this.finish=byId('xr-finish');this.sliders=byId('xr-sliders');this.crosshair=byId('xr-crosshair');this.backend=null;this.xr8Tracking=null;this.xr8ExposureReference=null;this.lightEstimateAvailable=false;this.ready=this.init();}
+ constructor(){this.isReady=false;this.supported=false;this.active=false;this.placed=false;this.hit=null;this.hitResult=null;this.hitSource=null;this.anchor=null;this.materialIndex=0;this.width=2.4;this.depth=3;this.radius=0;this.timer=0;this.revealing=false;this.canvas=byId('xr-canvas');this.overlay=byId('xr-overlay');this.status=byId('xr-status');this.action=byId('xr-action');this.message=byId('xr-step-message');this.finish=byId('xr-finish');this.sliders=byId('xr-sliders');this.crosshair=byId('xr-crosshair');this.backend=null;this.xr8Tracking=null;this.xr8ExposureReference=null;this.lightEstimateAvailable=false;this.depthReady=false;this.depthStatusFrames=0;this.depthWarningShown=false;this.ready=this.init();}
  async init(){
   const app=new pc.Application(this.canvas,{graphicsDeviceOptions:{alpha:true,antialias:true,depth:true}});this.app=app;app.setCanvasFillMode(pc.FILLMODE_FILL_WINDOW);app.setCanvasResolution(pc.RESOLUTION_AUTO);app.scene.ambientLight=new pc.Color(.60,.62,.64);
   this.arLight=new pc.Entity('FLOOR-ENVIRONMENT-LIGHT');
@@ -26,7 +52,7 @@ export class FloorWebXR {
   const makeMat=()=>{let m=new pc.StandardMaterial();m.diffuse.set(1,1,1);
    // Unlit textures cannot respond to Environmental HDR or XR8 exposure.
    m.useLighting=true;m.metalness=0;m.gloss=15;m.cull=pc.CULLFACE_NONE;m.update();return m;};
-  this.oldMat=makeMat();this.newMat=makeMat();this.newMat.blendType=pc.BLEND_NORMAL;this.newMat.depthWrite=false;
+  this.oldMat=makeOccludedFloorMaterial(false);this.newMat=makeOccludedFloorMaterial(true);
   const plane=(name,mat,y)=>{let e=new pc.Entity(name);e.addComponent('render',{type:'plane',material:mat});e.setLocalPosition(0,y,0);e.setLocalScale(this.width,1,this.depth);this.root.addChild(e);e.enabled=false;return e;};
   this.basePlane=plane('FLOOR-BASE',this.oldMat,.006);this.revealPlane=plane('FLOOR-REVEAL',this.newMat,.012);
   const markMat=makeMat();markMat.emissive.set(1,.86,0);markMat.useLighting=false;markMat.update();this.reticle=new pc.Entity('RETICLE');app.root.addChild(this.reticle);
