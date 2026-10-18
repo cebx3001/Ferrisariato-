@@ -137,7 +137,17 @@ scene.render.engine="CYCLES";scene.cycles.samples=24
 scene.render.resolution_x=820;scene.render.resolution_y=700
 scene.render.resolution_percentage=100
 scene.render.film_transparent=True
-scene.world.color=(.30,.30,.30)
+# Legacy 2.78 file contains a colored HDR world and compositing chain; both
+# must be replaced so true PBR colors are visible in QA renders.
+scene.use_nodes=False
+qa_world=bpy.data.worlds.new("NEUTRAL_QA_WORLD")
+qa_world.use_nodes=True
+bg=qa_world.node_tree.nodes.get("Background")
+bg.inputs["Color"].default_value=(.45,.45,.45,1)
+bg.inputs["Strength"].default_value=.38
+scene.world=qa_world
+scene.view_settings.exposure=0
+scene.view_settings.gamma=1
 camdat=bpy.data.cameras.new("QA Camera");cam=bpy.data.objects.new("QA Camera",camdat)
 bpy.context.collection.objects.link(cam);scene.camera=cam
 camdat.type="ORTHO";camdat.ortho_scale=1.70
