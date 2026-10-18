@@ -31,10 +31,24 @@
   ],
   "dimensions_m": [
     1.05,
-    0.7285,
-    0.7001
+    0.7263,
+    0.6933
   ],
-  "glb_bytes": 2661552,
+  "glb_bytes": 11579340,
+  "original_vertices": {
+    "Cube": 16,
+    "Cube.001": 8,
+    "Plane": 146,
+    "Plane.001": 322,
+    "Plane.002": 16
+  },
+  "enhanced_vertices": {
+    "Cube": 192,
+    "Cube.001": 96,
+    "Plane": 2306,
+    "Plane.001": 5122,
+    "Plane.002": 96
+  },
   "textures": [
     "ratten_graphite_color.png",
     "ratten_graphite_normal.png",
