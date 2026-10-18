@@ -9,7 +9,7 @@ const clamp=(n,min,max)=>Math.min(max,Math.max(min,n));
 export class FerrisARViewer {
  constructor(canvas,{onStatus=()=>{},onTracking=()=>{},onXRStop=()=>{}}={}){
   this.canvas=canvas;this.onStatus=onStatus;this.onTracking=onTracking;this.onXRStop=onXRStop;
-  this.app=new pc.Application(canvas,{graphicsDeviceOptions:{alpha:true,antialias:true,depth:true,preserveDrawingBuffer:true}});
+  this.app=new pc.Application(canvas,{graphicsDeviceOptions:{alpha:true,antialias:true,depth:true,preserveDrawingBuffer:false}});
   this.app.setCanvasFillMode(pc.FILLMODE_FILL_WINDOW);this.app.setCanvasResolution(pc.RESOLUTION_AUTO);
   this.app.scene.ambientLight=new pc.Color(.70,.75,.80);
   this.camera=new pc.Entity('CAMERA');this.camera.addComponent('camera',{clearColor:new pc.Color(0,0,0,0),nearClip:.015,farClip:120,fov:60});this.app.root.addChild(this.camera);
