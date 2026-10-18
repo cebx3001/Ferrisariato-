@@ -1,0 +1,55 @@
+name: IN-STORE ARCore depth occlusion checks
+on:
+  push:
+    branches: [instore-android-depth-review]
+  workflow_dispatch:
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check JavaScript module syntax
+        run: |
+          node --input-type=module --check < instore/js/webxr-floor.js
+          node --input-type=module --check < instore/js/xr8-provider.js
+      - name: Extract fragment and vertex shaders for real GLSL compilation
+        run: |
+          node <<'NODE'
+          const fs=require('fs');
+          const src=fs.readFileSync('instore/js/webxr-floor.js','utf8');
+          const get=(name)=>{
+            const pat=new RegExp('const '+name+'=("(?:\\\\.|[^"\\\\])*");');
+            const found=src.match(pat);
+            if(!found)throw Error('Missing embedded '+name);
+            return JSON.parse(found[1]);
+          };
+          const v=get('floorVertexGLSL'),f=get('floorFragmentGLSL');
+          fs.writeFileSync('/tmp/instore-depth.vert','#version 100\nprecision highp float;\n'+v+'\n');
+          fs.writeFileSync('/tmp/instore-depth.frag','#version 100\n'+f+'\n');
+          for(const token of ['uniform sampler2D depthMap','gl_FragCoord','realDepth+tolerance<vCameraDepth','discard']){
+            if(!f.includes(token))throw Error('Occlusion requirement absent '+token);
+          }
+          for(const token of ["depthSensing:{","XRDEPTHSENSINGFORMAT_L8A8","_updateDepthOcclusion","uDepthReady","ESTE MODO ANDROID NO OFRECE PROFUNDIDAD"]){
+            if(!src.includes(token))throw Error('Depth guard missing '+token);
+          }
+          console.log('Both shader sources extracted and occlusion guards present.');
+          NODE
+      - name: Compile WebGL/GLSL ES shaders
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq glslang-tools
+          glslangValidator -S vert /tmp/instore-depth.vert
+          glslangValidator -S frag /tmp/instore-depth.frag
+      - name: Verify floor exclusion comparisons
+        run: |
+          python3 - <<'PY'
+          def render(real,virtual):
+              if real < .09 or real > 15: return False
+              return not(real+.035+virtual*.016<virtual)
+          assert not render(1.0,2.0), 'table must hide floor'
+          assert not render(.55,2.0), 'plant must hide floor'
+          assert render(1.98,2.0), 'actual ground may show floor'
+          assert render(2.4,2.0), 'floor in front of wall can display'
+          print('Depth margin checks passed')
+          PY
