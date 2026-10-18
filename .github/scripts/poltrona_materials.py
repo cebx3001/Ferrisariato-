@@ -8,7 +8,8 @@ from mathutils import Vector, Matrix
 src, dest = map(Path, sys.argv[sys.argv.index('--')+1:])
 dest.mkdir(parents=True,exist_ok=True)
 bpy.ops.wm.open_mainfile(filepath=str(src.resolve()),load_ui=False)
-meshes=[o for o in bpy.data.objects if o.type=='MESH' and len(o.data.vertices)>0]
+meshes=[o for o in bpy.data.objects if o.type=='MESH' and o.name in {'Cube','Cube.001','Plane','Plane.001','Plane.002'} and len(o.data.vertices)>0]
+# Source also contains untextured auxiliary Plane.003 and Referencia; they are not parts of this chair.
 if not meshes: raise RuntimeError("No original meshes!")
 print("SOURCE",[(o.name,len(o.data.vertices),[m.name for m in o.data.materials if m]) for o in meshes],flush=True)
 
