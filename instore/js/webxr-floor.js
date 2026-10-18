@@ -62,7 +62,8 @@ export class FloorWebXR {
   this.newMat.setParameter('uRevealMask',this.maskTex);
   // Bind a harmless texture until WebXR provides its real depth buffer.
   this.emptyDepth=new pc.Texture(app.graphicsDevice,{width:1,height:1,format:pc.PIXELFORMAT_RGBA8,mipmaps:false});
-  this.emptyDepth.setSource(new Uint8Array([0,0,0,0]));
+  const emptyCanvas=document.createElement('canvas');emptyCanvas.width=emptyCanvas.height=1;
+  emptyCanvas.getContext('2d').clearRect(0,0,1,1);this.emptyDepth.setSource(emptyCanvas);
   for(const m of [this.oldMat,this.newMat])m.setParameter('depthMap',this.emptyDepth);
   this.textures=await Promise.all(MATERIALS.map(async m=>{let img=await loadImage(m.url);let tex=new pc.Texture(app.graphicsDevice,{width:img.naturalWidth,height:img.naturalHeight,format:pc.PIXELFORMAT_RGBA8,mipmaps:true,minFilter:pc.FILTER_LINEAR_MIPMAP_LINEAR,magFilter:pc.FILTER_LINEAR,addressU:pc.ADDRESS_REPEAT,addressV:pc.ADDRESS_REPEAT});tex.setSource(img);return tex;}));
   this.oldMat.setParameter('uFloorMap',this.textures[0]);this.newMat.setParameter('uFloorMap',this.textures[0]);this.sizeMaterials();this.paintMask(0);
@@ -131,7 +132,7 @@ export class FloorWebXR {
   const pixelFormat=views?.depthPixelFormat;
   // WebGL phone path: packed LA8 or float32.
   const understood=pixelFormat===pc.PIXELFORMAT_LA8||pixelFormat===pc.PIXELFORMAT_R32F;
-  const ready=!!(views?.availableDepth&&depthTexture&&view?.depthUvMatrix&&understood);
+  const ready=!!(views?.availableDepth&&depthTexture&&view?.depthUvMatrix&&understood&&Number.isFinite(view.depthValueToMeters)&&view.depthValueToMeters>0);
   this.depthReady=ready;
   for(const mat of [this.oldMat,this.newMat]){
    mat.setParameter('uDepthReady',ready?1:0);
@@ -172,7 +173,7 @@ export class FloorWebXR {
  sizeMaterials(){const tiling=new Float32Array([this.width/1.2,this.depth/1.2]);for(const m of [this.oldMat,this.newMat])m.setParameter('uFloorTiling',tiling);}
  start(){if(!this.isReady||!this.supported)return;this.backend=preferredTracking({mobile:this.xr8Available,ios:this.isIOS,nativeSupported:this.nativeSupported,xr8Available:this.xr8Available,override:new URLSearchParams(location.search).get('tracking')});this.active=true;this.placed=false;this.hit=null;this.depthReady=false;this.depthStatusFrames=0;this.depthWarningShown=false;this._enterLightMode();this.canvas.style.display='block';this.overlay.style.display='block';this.basePlane.enabled=false;this.revealPlane.enabled=false;this.reticle.enabled=false;this.crosshair.classList.remove('detected');this.finish.hidden=true;this.sliders.hidden=true;this.action.textContent='COLOCAR SUELO';this.message.textContent='BUSCANDO SUPERFICIE...';this.app.resizeCanvas(window.innerWidth,window.innerHeight);this._setDepthRequired(!this.isIOS);if(this.backend==='xr8'){if(!this.isIOS){this.status.textContent='ANDROID 8TH WALL SIN PROFUNDIDAD';this.message.textContent='SE REQUIERE CHROME CON ARCORE PARA OCLUSIÓN';}void this.startXR8();return;}this.app.xr.domOverlay.root=this.overlay;
  // Must be invoked directly within a click; no await before starting WebXR.
- this.app.xr.start(this.camera.camera,pc.XRTYPE_AR,pc.XRSPACE_LOCALFLOOR,{planeDetection:true,anchors:true,optionalFeatures:['light-estimation'],depthSensing:{usagePreference:pc.XRDEPTHSENSINGUSAGE_CPU,dataFormatPreference:pc.XRDEPTHSENSINGFORMAT_LA8},callback:err=>{if(err){this.status.textContent='ARCore/WebXR no inició: '+(err?.message||err);if(this.xr8Available){this.backend='xr8';void this.startXR8();}else this.end();}}});
+ this.app.xr.start(this.camera.camera,pc.XRTYPE_AR,pc.XRSPACE_LOCALFLOOR,{planeDetection:true,anchors:true,optionalFeatures:['light-estimation'],depthSensing:{usagePreference:pc.XRDEPTHSENSINGUSAGE_CPU,dataFormatPreference:pc.XRDEPTHSENSINGFORMAT_L8A8},callback:err=>{if(err){this.status.textContent='ARCore/WebXR no inició: '+(err?.message||err);if(this.xr8Available){this.backend='xr8';void this.startXR8();}else this.end();}}});
  this.app.xr.once('start',()=>{try{if(this.app.xr.lightEstimation?.supported)this.app.xr.lightEstimation.start();}catch(e){console.warn('Light estimation unavailable',e);}if(!this.app.xr.hitTest.supported){this.status.textContent='WEBXR SIN DETECCIÓN DE SUELO · ACTIVANDO 8TH WALL';this.pendingXR8Fallback=this.xr8Available;this.app.xr.end();return;}this.status.textContent='MUEVE EL TELÉFONO · ANALIZANDO PISO Y PROFUNDIDAD';this.app.xr.hitTest.start({spaceType:pc.XRSPACE_VIEWER,callback:(err,source)=>{if(err){this.status.textContent='NO SE PUDO DETECTAR EL PISO';return;}this.hitSource=source;source.on('result',(pos,rot,input,result)=>{this.hit=pos.clone();this.hitResult=result;if(!this.placed){this.reticle.setPosition(pos.x,pos.y+.02,pos.z);this.reticle.enabled=true;this.crosshair.classList.add('detected');this.status.textContent=this.depthReady?'SUELO Y PROFUNDIDAD DETECTADOS · COLOCA EL PISO':'SUELO DETECTADO · ESPERANDO PROFUNDIDAD ARCORE';this.message.textContent=this.depthReady?'OCLUSIÓN ACTIVA: MUEBLES Y PLANTAS PROTEGIDOS':'ESPERANDO PROFUNDIDAD DE LA HABITACIÓN';}});}});});
  }
  async startXR8(){
