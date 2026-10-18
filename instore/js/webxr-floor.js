@@ -119,6 +119,56 @@ export class FloorWebXR {
   this.lightEstimateAvailable=true;
  }
 
+
+ _setDepthRequired(required){
+  for(const m of [this.oldMat,this.newMat])m.setParameter('uDepthRequired',required?1:0);
+ }
+ _updateDepthOcclusion(){
+  if(this.backend!=='native'||!this.app.xr.active){this.depthReady=false;return;}
+  const views=this.app.xr.views;
+  const view=views?.get?.(pc.XREYE_NONE)||views?.list?.[0];
+  const depthTexture=view?.textureDepth;
+  const pixelFormat=views?.depthPixelFormat;
+  // WebGL phone path: packed LA8 or float32.
+  const understood=pixelFormat===pc.PIXELFORMAT_LA8||pixelFormat===pc.PIXELFORMAT_R32F;
+  const ready=!!(views?.availableDepth&&depthTexture&&view?.depthUvMatrix&&understood);
+  this.depthReady=ready;
+  for(const mat of [this.oldMat,this.newMat]){
+   mat.setParameter('uDepthReady',ready?1:0);
+   if(ready){
+    mat.setParameter('depthMap',depthTexture);
+    mat.setParameter('matrix_depth_uv',view.depthUvMatrix.data);
+    mat.setParameter('depth_to_meters',view.depthValueToMeters);
+    mat.setParameter('uDepthFloat',pixelFormat===pc.PIXELFORMAT_R32F?1:0);
+   }
+  }
+  if(!this.placed&&++this.depthStatusFrames%90===0){
+   this.status.textContent=ready?'PROFUNDIDAD ARCORE ACTIVA · UBICA EL PISO':'ARCORE SIN MAPA DE PROFUNDIDAD · MUEVE LENTAMENTE LA CÁMARA';
+   this.message.textContent=ready?'OBJETOS REALES EXCLUIDOS · LISTO PARA COLOCAR':'ESPERANDO PROFUNDIDAD · NO SE PINTARÁ SOBRE MUEBLES';
+  }
+  if(this.placed&&!ready){
+   if(!this.depthWarningShown){
+    this.depthWarningShown=true;
+    this.message.textContent='SE PERDIÓ PROFUNDIDAD · MATERIAL TEMPORALMENTE OCULTO';
+   }
+  }else if(ready&&this.depthWarningShown){
+   this.depthWarningShown=false;
+   this.message.textContent='PROFUNDIDAD RESTABLECIDA · OCLUSIÓN ACTIVA';
+  }
+ }
+ _updateFloorLighting(){
+  // Depth shader cannot receive StandardMaterial lighting automatically.
+  // Reuse the existing smoothly estimated ARCore/8th Wall illumination.
+  const dir=this.arLight.light,amb=this.app.scene.ambientLight;
+  const strength=clamp(.56+dir.intensity*.30,.62,1.27);
+  const tint=new Float32Array([
+   clamp((amb.r*.42+dir.color.r*.58)*strength,.44,1.25),
+   clamp((amb.g*.42+dir.color.g*.58)*strength,.44,1.25),
+   clamp((amb.b*.42+dir.color.b*.58)*strength,.44,1.25)
+  ]);
+  for(const mat of [this.oldMat,this.newMat])mat.setParameter('uLightTint',tint);
+ }
+
  sizeMaterials(){const tiling=new Float32Array([this.width/1.2,this.depth/1.2]);for(const m of [this.oldMat,this.newMat])m.setParameter('uFloorTiling',tiling);}
  start(){if(!this.isReady||!this.supported)return;this.backend=preferredTracking({mobile:this.xr8Available,ios:this.isIOS,nativeSupported:this.nativeSupported,xr8Available:this.xr8Available,override:new URLSearchParams(location.search).get('tracking')});this.active=true;this.placed=false;this.hit=null;this.depthReady=false;this.depthStatusFrames=0;this.depthWarningShown=false;this._enterLightMode();this.canvas.style.display='block';this.overlay.style.display='block';this.basePlane.enabled=false;this.revealPlane.enabled=false;this.reticle.enabled=false;this.crosshair.classList.remove('detected');this.finish.hidden=true;this.sliders.hidden=true;this.action.textContent='COLOCAR SUELO';this.message.textContent='BUSCANDO SUPERFICIE...';this.app.resizeCanvas(window.innerWidth,window.innerHeight);this._setDepthRequired(!this.isIOS);if(this.backend==='xr8'){if(!this.isIOS){this.status.textContent='ANDROID 8TH WALL SIN PROFUNDIDAD';this.message.textContent='SE REQUIERE CHROME CON ARCORE PARA OCLUSIÓN';}void this.startXR8();return;}this.app.xr.domOverlay.root=this.overlay;
  // Must be invoked directly within a click; no await before starting WebXR.
@@ -136,7 +186,7 @@ export class FloorWebXR {
  }
  place(){if(this.backend==='native'&&!this.depthReady){this.message.textContent='SIN PROFUNDIDAD: NO SE COLOCARÁ EL MATERIAL SOBRE MUEBLES';this.status.textContent='REVISA ARCORE Y CHROME · MUEVE LENTAMENTE LA CÁMARA';return;}if(this.backend==='xr8'&&!this.isIOS){this.message.textContent='ESTE MODO ANDROID NO OFRECE PROFUNDIDAD; UTILIZA CHROME/ARCORE';return;}if(this.backend==='xr8'){const p=this.xr8Tracking?.lock();if(!p){this.message.textContent='BUSCA UNA SUPERFICIE ESTABLE';return;}this.hit=new pc.Vec3(p.x,p.y,p.z);}if(!this.hit){this.message.textContent='APUNTA A UNA SUPERFICIE HORIZONTAL';return;}this.placed=true;this.root.setPosition(this.hit);this.reticle.enabled=false;this.revealPlane.enabled=true;this.action.textContent='CAMBIAR MATERIAL';this.sliders.hidden=false;this.finish.hidden=false;this.reveal();if(this.backend!=='xr8'&&this.app.xr.anchors?.available && this.hitResult){try{this.app.xr.anchors.create(this.hitResult,(err,anchor)=>{if(!err&&anchor)this.anchor=anchor;});}catch{}}}
  reveal(){if(!this.placed)return;const idx=this.materialIndex;if(this.lastIndex!==undefined){this.oldMat.setParameter('uFloorMap',this.textures[this.lastIndex]);this.basePlane.enabled=true;}else this.basePlane.enabled=false;this.newMat.setParameter('uFloorMap',this.textures[idx]);this.revealPlane.enabled=true;this.revealing=true;this.radius=0;this.timer=0;this.paintMask(0);this.message.textContent='REVELANDO MATERIAL...';}
- update(dt){if(!this.active)return;if(this.backend==='native')this._applyNativeLight();if(this.anchor&&this.placed){try{this.root.setPosition(this.anchor.getPosition());}catch{}}if(!this.revealing)return;this.timer=Math.min(1.35,this.timer+dt);this.radius=easing(this.timer/1.25)*(Math.hypot(this.width,this.depth)*.67+.3);this.paintMask(this.radius);if(this.timer>=1.25){this.revealing=false;this.lastIndex=this.materialIndex;this.oldMat.setParameter('uFloorMap',this.textures[this.materialIndex]);this.basePlane.enabled=true;this.revealPlane.enabled=false;this.message.textContent='PRUEBA OTRO ACABADO O TERMINA LA EXPERIENCIA';}}
+ update(dt){if(!this.active)return;if(this.backend==='native'){this._applyNativeLight();this._updateDepthOcclusion();}this._updateFloorLighting();if(this.anchor&&this.placed){try{this.root.setPosition(this.anchor.getPosition());}catch{}}if(!this.revealing)return;this.timer=Math.min(1.35,this.timer+dt);this.radius=easing(this.timer/1.25)*(Math.hypot(this.width,this.depth)*.67+.3);this.paintMask(this.radius);if(this.timer>=1.25){this.revealing=false;this.lastIndex=this.materialIndex;this.oldMat.setParameter('uFloorMap',this.textures[this.materialIndex]);this.basePlane.enabled=true;this.revealPlane.enabled=false;this.message.textContent='PRUEBA OTRO ACABADO O TERMINA LA EXPERIENCIA';}}
  paintMask(radius){const w=128,h=128,im=this.maskCtx.createImageData(w,h),d=im.data;for(let y=0;y<h;y++)for(let x=0;x<w;x++){const px=(x/127-.5)*this.width,pz=(y/127-.5)*this.depth,t=Math.hypot(px,pz),a=Math.max(0,Math.min(1,(radius+.08-t)/.16));const v=Math.round(a*255),i=(y*w+x)*4;d[i]=d[i+1]=d[i+2]=v;d[i+3]=255;}this.maskCtx.putImageData(im,0,0);this.maskTex.setSource(this.mask);}
  stop(){this.pendingXR8Fallback=false;if(this.backend==='xr8'){this.xr8Tracking?.stop();return;}if(this.app.xr.active)this.app.xr.end();else this.end();}
  end(){const fallback=this.pendingXR8Fallback&&this.xr8Available;this.pendingXR8Fallback=false;this.active=false;this.backend=null;this.placed=false;this.depthReady=false;this._setDepthRequired(false);this._enterLightMode();this.canvas.style.display='none';this.overlay.style.display='none';this.reticle.enabled=false;this.revealPlane.enabled=false;this.basePlane.enabled=false;this.hitSource?.remove?.();this.hitSource=null;this.anchor?.destroy?.();this.anchor=null;this.lastIndex=undefined;if(fallback){this.active=true;this.backend='xr8';this.canvas.style.display='block';this.overlay.style.display='block';void this.startXR8();}}
