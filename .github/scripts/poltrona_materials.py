@@ -14,7 +14,7 @@ if not meshes: raise RuntimeError("No original meshes!")
 print("SOURCE",[(o.name,len(o.data.vertices),[m.name for m in o.data.materials if m]) for o in meshes],flush=True)
 
 # Create genuinely embedded raster PBR textures, not viewport colors or missing external files.
-N=512
+N=1024
 yy,xx=np.mgrid[0:N,0:N].astype(np.float32)
 rng=np.random.default_rng(461)
 noise=rng.normal(size=(N,N)).astype(np.float32)
@@ -33,20 +33,21 @@ def write_texture(name, rgb, height, strength):
     return img,nm
 
 # A tight over-under woven charcoal wicker. The relief is raster-baked so WebGL sees it.
-col=((xx+((yy//16)%2)*12)%24)
-lane=yy%16
-cross=np.exp(-((col-12)/5.3)**4).astype(np.float32)
-warp=np.exp(-((lane-8)/5.5)**4).astype(np.float32)
-weave=(cross*0.60+warp*0.40)
-height=(weave+0.14*np.sin(xx*1.17)+0.12*np.sin(yy*0.91)).astype(np.float32)
-value=17+15*weave+1.5*noise
+col=((xx+((yy//30)%2)*20)%40)
+lane=yy%30
+cross=np.exp(-((col-20)/8.0)**4).astype(np.float32)
+warp=np.exp(-((lane-15)/10.2)**4).astype(np.float32)
+weave=(cross*0.58+warp*0.42)
+strand=(np.cos(xx*0.68+0.18*np.sin(yy*.3))*np.sin(yy*.74))*0.09
+height=(weave+strand+0.12*np.sin(xx*1.17)+0.09*np.sin(yy*0.91)).astype(np.float32)
+value=17+21*weave+1.8*noise+2.7*strand
 r=np.stack((value*0.96,value,value*1.03),axis=-1).astype(np.float32)
 wicker=write_texture("ratten_graphite",r,height,4.7)
 
 # Calm slate-blue fabric matching the user's exact photograph; subtle fine weave.
-threads=(np.sin(xx*2.8)+np.sin(yy*2.9))*.46
+threads=(np.sin(xx*2.15)+np.sin(yy*2.21))*.65
 value=threads+noise*.52+2.8*np.sin(xx*.023+yy*.011)
-fab=np.stack((78+value,95+value,113+value),axis=-1).astype(np.float32)
+fab=np.stack((77+value,92+value,109+value),axis=-1).astype(np.float32)
 cushion=write_texture("cushion_slate_blue",fab,threads+noise*.12,0.22)
 
 # Four warm dark-wood inclined legs, anisotropic wood grain.
@@ -106,6 +107,23 @@ print("MATERIAL_ASSIGNMENTS",assignments,flush=True)
 if {a[2] for a in assignments}!={"wood","wicker","cushion"}:
     raise RuntimeError("Three material families not found")
 
+
+# Original model is exceptionally coarse. Subdivide only the sculpted shell and
+# cushion to smooth their silhouette while maintaining original furniture geometry.
+source_vertices={o.name:len(o.data.vertices) for o in meshes}
+for o in meshes:
+    if o.name not in ('Plane','Plane.001'): continue
+    for other in bpy.context.selected_objects:other.select_set(False)
+    o.select_set(True);bpy.context.view_layer.objects.active=o
+    mod=o.modifiers.new('Smooth manufacturer geometry','SUBSURF')
+    mod.subdivision_type='CATMULL_CLARK'
+    mod.levels=2
+    mod.render_levels=2
+    bpy.ops.object.modifier_apply(modifier=mod.name)
+    for face in o.data.polygons:face.use_smooth=True
+print('ORIGINAL_VERTICES',source_vertices,flush=True)
+print('SMOOTHED_VERTICES',[(o.name,len(o.data.vertices)) for o in meshes],flush=True)
+
 # Restore previously published real-world normalization. Never change local mesh positions.
 pts=[o.matrix_world @ Vector(c) for o in meshes for c in o.bound_box]
 mn=[min(v[i] for v in pts) for i in range(3)]
@@ -117,6 +135,19 @@ fix=Matrix.Scale(scale,4) @ Matrix.Translation(-center)
 world={o:o.matrix_world.copy() for o in meshes}
 for o in meshes:o.parent=None
 for o in meshes:o.matrix_world=fix@world[o]
+
+# Refine all feet with small beveled edges in meters; keep their positions and heights.
+for o in meshes:
+    if o.name not in ('Cube','Cube.001','Plane.002'):continue
+    for other in bpy.context.selected_objects:other.select_set(False)
+    o.select_set(True);bpy.context.view_layer.objects.active=o
+    bevel=o.modifiers.new('Wood foot edge refinement','BEVEL')
+    bevel.width=.003
+    bevel.segments=3
+    bevel.limit_method='ANGLE'
+    try:bpy.ops.object.modifier_apply(modifier=bevel.name)
+    except Exception as exc:print('BEVEL_SKIP',o.name,str(exc),flush=True)
+
 for o in bpy.context.selected_objects:o.select_set(False)
 for o in meshes:o.select_set(True)
 bpy.context.view_layer.objects.active=meshes[0]
@@ -169,6 +200,8 @@ for name,pos in [("threequarter",(1.6,-2.2,1.35)),("front",(0,-2.8,.82)),("side"
     "source":src.name,"model":"Poltrona PL 461","mesh_count":len(meshes),
     "source_materials":assignments,"dimensions_m":[round(size[0]*scale,4),round(size[2]*scale,4),round(size[1]*scale,4)],
     "glb_bytes":target.stat().st_size,
+    "original_vertices":source_vertices,
+    "enhanced_vertices":{o.name:len(o.data.vertices) for o in meshes},
     "textures":["ratten_graphite_color.png","ratten_graphite_normal.png",
                 "cushion_slate_blue_color.png","cushion_slate_blue_normal.png",
                 "legs_dark_wood_color.png","legs_dark_wood_normal.png"]

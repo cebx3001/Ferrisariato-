@@ -1,7 +1,7 @@
 name: Poltrona PL 461 material preview (isolated)
 on:
   push:
-    branches: [poltrona-materials-review]
+    branches: [poltrona-materials-review, poltrona-quality-review]
     paths:
       - '.github/workflows/poltrona-material-preview.yml'
       - '.github/scripts/poltrona_materials.py'
@@ -43,6 +43,11 @@ jobs:
           size,ctype=struct.unpack_from('<II',b,12)
           doc=json.loads(b[20:20+size])
           assert len(doc.get('images',[]))>=6,doc.get('images')
+          assert len(doc.get('meshes',[]))>=5
+          from pathlib import Path
+          rep=json.loads(Path('home/assets/preview-poltrona/report.json').read_text())
+          assert rep['enhanced_vertices']['Plane']>rep['original_vertices']['Plane']*3
+          assert rep['enhanced_vertices']['Plane.001']>rep['original_vertices']['Plane.001']*3
           assert len(doc.get('textures',[]))>=6,doc.get('textures')
           for mat in doc['materials']:
               assert mat['pbrMetallicRoughness']['baseColorTexture'],mat
