@@ -1,9 +1,9 @@
 import {PRODUCTS} from './products.js';
 const $=s=>document.getElementById(s), storeKey='ferrisariato-home-saved-v1';
 let viewer=null,engineReady=false,selected=PRODUCTS[0],saved=new Set(),mode='studio',modelPlaced=true,moving=false,rotation=0,scale=1;let toastTimer=0;
-try{saved=new Set(JSON.parse(localStorage.getItem(storeKey)||'[]'));}catch{}
+try{saved=new Set(JSON.parse(localStorage.getItem(storeKey)||'[]').filter(id=>PRODUCTS.some(p=>p.id===id)));}catch{}
 
-// Five real user-supplied models load in PlayCanvas; the sixth stays as photo reference.
+// Only the verified patio set remains in the public HOME catalog.
 const MOCKUP=PRODUCTS.every(p=>!p.modelReady);
 function updateConcept(){
  const root=$('viewer'),photo=$('concept-photo');
