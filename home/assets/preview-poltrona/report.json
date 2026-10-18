@@ -34,7 +34,7 @@
     0.7263,
     0.6933
   ],
-  "glb_bytes": 11579340,
+  "glb_bytes": 1890096,
   "original_vertices": {
     "Cube": 16,
     "Cube.001": 8,
@@ -50,11 +50,11 @@
     "Plane.002": 96
   },
   "textures": [
-    "ratten_graphite_color.png",
-    "ratten_graphite_normal.png",
-    "cushion_slate_blue_color.png",
-    "cushion_slate_blue_normal.png",
-    "legs_dark_wood_color.png",
-    "legs_dark_wood_normal.png"
+    "ratten_graphite_color.jpg",
+    "ratten_graphite_normal.jpg",
+    "cushion_slate_blue_color.jpg",
+    "cushion_slate_blue_normal.jpg",
+    "legs_dark_wood_color.jpg",
+    "legs_dark_wood_normal.jpg"
   ]
 }
