@@ -39,14 +39,14 @@ cross=np.exp(-((col-12)/5.3)**4).astype(np.float32)
 warp=np.exp(-((lane-8)/5.5)**4).astype(np.float32)
 weave=(cross*0.60+warp*0.40)
 height=(weave+0.14*np.sin(xx*1.17)+0.12*np.sin(yy*0.91)).astype(np.float32)
-value=24+24*weave+2.0*noise
+value=17+15*weave+1.5*noise
 r=np.stack((value*0.96,value,value*1.03),axis=-1).astype(np.float32)
 wicker=write_texture("ratten_graphite",r,height,4.7)
 
 # Calm slate-blue fabric matching the user's exact photograph; subtle fine weave.
 threads=(np.sin(xx*2.8)+np.sin(yy*2.9))*.46
 value=threads+noise*.52+2.8*np.sin(xx*.023+yy*.011)
-fab=np.stack((94+value,110+value,129+value),axis=-1).astype(np.float32)
+fab=np.stack((78+value,95+value,113+value),axis=-1).astype(np.float32)
 cushion=write_texture("cushion_slate_blue",fab,threads+noise*.12,0.22)
 
 # Four warm dark-wood inclined legs, anisotropic wood grain.
@@ -144,7 +144,7 @@ qa_world=bpy.data.worlds.new("NEUTRAL_QA_WORLD")
 qa_world.use_nodes=True
 bg=qa_world.node_tree.nodes.get("Background")
 bg.inputs["Color"].default_value=(.45,.45,.45,1)
-bg.inputs["Strength"].default_value=.38
+bg.inputs["Strength"].default_value=.20
 scene.world=qa_world
 scene.view_settings.exposure=0
 scene.view_settings.gamma=1
@@ -156,9 +156,9 @@ def light(name,power,pos,size):
     d=bpy.data.lights.new(name,'AREA');d.energy=power;d.shape='DISK';d.size=size
     o=bpy.data.objects.new(name,d);bpy.context.collection.objects.link(o)
     o.location=pos;o.rotation_euler=(look-o.location).to_track_quat('-Z','Y').to_euler()
-light("KEY",500,(-2.4,-3.0,4.0),3.0)
-light("FILL",270,(2.1,1.0,2.4),3.0)
-light("RIM",400,(0.8,2.2,3.0),2.2)
+light("KEY",220,(-2.4,-3.0,4.0),3.0)
+light("FILL",130,(2.1,1.0,2.4),3.0)
+light("RIM",180,(0.8,2.2,3.0),2.2)
 scene.view_settings.view_transform="Standard"
 for name,pos in [("threequarter",(1.6,-2.2,1.35)),("front",(0,-2.8,.82)),("side",(2.9,0,.80)),("rear",(0,2.8,.85))]:
     cam.location=pos;cam.rotation_euler=(look-cam.location).to_track_quat('-Z','Y').to_euler()
