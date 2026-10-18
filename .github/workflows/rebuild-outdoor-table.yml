@@ -1,0 +1,62 @@
+name: Rebuild final table GLB for three-item HOME catalog
+on:
+  push:
+    branches: [home-three-furniture-review]
+    paths:
+      - '.github/scripts/rebuild-outdoor-table.py'
+      - '.github/workflows/rebuild-outdoor-table.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build-table:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Recover published original table geometry
+        run: |
+          git fetch --depth=1 origin bd3a012ff9c9a413e574a7b7eea51f4c34dbc2a1
+          mkdir -p /tmp/table-input
+          git show bd3a012ff9c9a413e574a7b7eea51f4c34dbc2a1:home/assets/models/mesa-exterior-original.glb > /tmp/table-input/mesa-original.glb
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('/tmp/table-input/mesa-original.glb')
+          assert p.read_bytes()[:4]==b'glTF' and p.stat().st_size>700000
+          PY
+      - name: Install Blender
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y libgl1 libx11-6 libxi6 libxxf86vm1
+          curl --fail --location --retry 3 --output /tmp/blender.tar.xz https://download.blender.org/release/Blender5.2/blender-5.2.2-linux-x64.tar.xz
+          mkdir -p /tmp/blender
+          tar -xf /tmp/blender.tar.xz -C /tmp/blender --strip-components=1
+      - name: Rebuild exact two material families with PBR wood color
+        run: |
+          /tmp/blender/blender --background --factory-startup --threads 2 --python-exit-code 7 --python .github/scripts/rebuild-outdoor-table.py -- /tmp/table-input/mesa-original.glb home/assets/preview-table
+      - name: Validate geometry dimensions, material assignments and embedded texture
+        run: |
+          python3 - <<'PY'
+          import json,struct
+          from pathlib import Path
+          p=Path('home/assets/preview-table/outdoor-table-materials.glb')
+          b=p.read_bytes();n,t=struct.unpack_from('<II',b,12);o=json.loads(b[20:20+n])
+          assert len(o['meshes'])==10
+          assert len(o['materials'])==2
+          assert len(o.get('images',[]))>=1
+          assert any(m.get('pbrMetallicRoughness',{}).get('baseColorTexture') for m in o['materials'])
+          info=json.loads(Path('home/assets/preview-table/table-report.json').read_text())
+          assert info['mesh_count']==10 and info['materials']=={'wood':5,'metal':5}
+          print('PASS',info)
+          PY
+      - name: Commit only table review assets
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add home/assets/preview-table
+          if ! git diff --cached --quiet; then
+            git commit -m 'Render restored outdoor table geometry with PBR wood and aluminum'
+            git push
+          fi
