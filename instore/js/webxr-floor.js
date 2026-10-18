@@ -134,6 +134,8 @@ export class FloorWebXR {
   const understood=pixelFormat===pc.PIXELFORMAT_LA8||pixelFormat===pc.PIXELFORMAT_R32F;
   const ready=!!(views?.availableDepth&&depthTexture&&view?.depthUvMatrix&&understood&&Number.isFinite(view.depthValueToMeters)&&view.depthValueToMeters>0);
   this.depthReady=ready;
+  // Use ARCore depth for occlusion when available; always show the floor otherwise.
+  this._setDepthRequired(ready);
   for(const mat of [this.oldMat,this.newMat]){
    mat.setParameter('uDepthReady',ready?1:0);
    if(ready){
@@ -144,13 +146,13 @@ export class FloorWebXR {
    }
   }
   if(!this.placed&&++this.depthStatusFrames%90===0){
-   this.status.textContent=ready?'PROFUNDIDAD ARCORE ACTIVA · UBICA EL PISO':'ARCORE SIN MAPA DE PROFUNDIDAD · MUEVE LENTAMENTE LA CÁMARA';
-   this.message.textContent=ready?'OBJETOS REALES EXCLUIDOS · LISTO PARA COLOCAR':'ESPERANDO PROFUNDIDAD · NO SE PINTARÁ SOBRE MUEBLES';
+   this.status.textContent=ready?'PROFUNDIDAD ARCORE ACTIVA · UBICA EL PISO':'SIN MAPA DE PROFUNDIDAD · PUEDES COLOCAR EL PISO';
+   this.message.textContent=ready?'OBJETOS REALES EXCLUIDOS · LISTO PARA COLOCAR':'PUEDES COLOCAR EL PISO · SIN OCLUSIÓN DE OBJETOS';
   }
   if(this.placed&&!ready){
    if(!this.depthWarningShown){
     this.depthWarningShown=true;
-    this.message.textContent='SE PERDIÓ PROFUNDIDAD · MATERIAL TEMPORALMENTE OCULTO';
+    this.message.textContent='SIN PROFUNDIDAD · EL PISO CONTINÚA VISIBLE';
    }
   }else if(ready&&this.depthWarningShown){
    this.depthWarningShown=false;
@@ -171,12 +173,13 @@ export class FloorWebXR {
  }
 
  sizeMaterials(){const tiling=new Float32Array([this.width/1.2,this.depth/1.2]);for(const m of [this.oldMat,this.newMat])m.setParameter('uFloorTiling',tiling);}
- start(){if(!this.isReady||!this.supported)return;this.backend=preferredTracking({mobile:this.xr8Available,ios:this.isIOS,nativeSupported:this.nativeSupported,xr8Available:this.xr8Available,override:new URLSearchParams(location.search).get('tracking')});this.active=true;this.placed=false;this.hit=null;this.depthReady=false;this.depthStatusFrames=0;this.depthWarningShown=false;this._enterLightMode();this.canvas.style.display='block';this.overlay.style.display='block';this.basePlane.enabled=false;this.revealPlane.enabled=false;this.reticle.enabled=false;this.crosshair.classList.remove('detected');this.finish.hidden=true;this.sliders.hidden=true;this.action.textContent='COLOCAR SUELO';this.message.textContent='BUSCANDO SUPERFICIE...';this.app.resizeCanvas(window.innerWidth,window.innerHeight);this._setDepthRequired(!this.isIOS);if(this.backend==='xr8'){if(!this.isIOS){this.status.textContent='ANDROID 8TH WALL SIN PROFUNDIDAD';this.message.textContent='SE REQUIERE CHROME CON ARCORE PARA OCLUSIÓN';}void this.startXR8();return;}this.app.xr.domOverlay.root=this.overlay;
+ start(){if(!this.isReady||!this.supported)return;this.backend=preferredTracking({mobile:this.xr8Available,ios:this.isIOS,nativeSupported:this.nativeSupported,xr8Available:this.xr8Available,override:new URLSearchParams(location.search).get('tracking')});this.active=true;this.placed=false;this.hit=null;this.depthReady=false;this.depthStatusFrames=0;this.depthWarningShown=false;this._enterLightMode();this.canvas.style.display='block';this.overlay.style.display='block';this.basePlane.enabled=false;this.revealPlane.enabled=false;this.reticle.enabled=false;this.crosshair.classList.remove('detected');this.finish.hidden=true;this.sliders.hidden=true;this.action.textContent='COLOCAR SUELO';this.message.textContent='BUSCANDO SUPERFICIE...';this.app.resizeCanvas(window.innerWidth,window.innerHeight);this._setDepthRequired(false);if(this.backend==='xr8'){if(!this.isIOS){this.status.textContent='ANDROID 8TH WALL SIN PROFUNDIDAD';this.message.textContent='PUEDES COLOCAR EL PISO SIN OCLUSIÓN';}void this.startXR8();return;}this.app.xr.domOverlay.root=this.overlay;
  // Must be invoked directly within a click; no await before starting WebXR.
  this.app.xr.start(this.camera.camera,pc.XRTYPE_AR,pc.XRSPACE_LOCALFLOOR,{planeDetection:true,anchors:true,optionalFeatures:['light-estimation'],depthSensing:{usagePreference:pc.XRDEPTHSENSINGUSAGE_CPU,dataFormatPreference:pc.XRDEPTHSENSINGFORMAT_L8A8},callback:err=>{if(err){this.status.textContent='ARCore/WebXR no inició: '+(err?.message||err);if(this.xr8Available){this.backend='xr8';void this.startXR8();}else this.end();}}});
  this.app.xr.once('start',()=>{try{if(this.app.xr.lightEstimation?.supported)this.app.xr.lightEstimation.start();}catch(e){console.warn('Light estimation unavailable',e);}if(!this.app.xr.hitTest.supported){this.status.textContent='WEBXR SIN DETECCIÓN DE SUELO · ACTIVANDO 8TH WALL';this.pendingXR8Fallback=this.xr8Available;this.app.xr.end();return;}this.status.textContent='MUEVE EL TELÉFONO · ANALIZANDO PISO Y PROFUNDIDAD';this.app.xr.hitTest.start({spaceType:pc.XRSPACE_VIEWER,callback:(err,source)=>{if(err){this.status.textContent='NO SE PUDO DETECTAR EL PISO';return;}this.hitSource=source;source.on('result',(pos,rot,input,result)=>{this.hit=pos.clone();this.hitResult=result;if(!this.placed){this.reticle.setPosition(pos.x,pos.y+.02,pos.z);this.reticle.enabled=true;this.crosshair.classList.add('detected');this.status.textContent=this.depthReady?'SUELO Y PROFUNDIDAD DETECTADOS · COLOCA EL PISO':'SUELO DETECTADO · ESPERANDO PROFUNDIDAD ARCORE';this.message.textContent=this.depthReady?'OCLUSIÓN ACTIVA: MUEBLES Y PLANTAS PROTEGIDOS':'ESPERANDO PROFUNDIDAD DE LA HABITACIÓN';}});}});});
  }
  async startXR8(){
+  this.depthReady=false;this._setDepthRequired(false);
   if(!this.xr8Tracking){this.xr8Tracking=new XR8Tracking({app:this.app,camera:this.camera,canvas:this.canvas,
     onStatus:(msg,isError)=>{this.status.textContent=msg;if(isError)this.message.textContent='ERROR DE SEGUIMIENTO';},
     onLighting:(lighting)=>this._applyXR8Light(lighting),
@@ -185,7 +188,7 @@ export class FloorWebXR {
    });}
   try{await this.xr8Tracking.start();}catch(e){console.error(e);this.status.textContent='8TH WALL: '+(e?.message||e);this.end();const label=byId('xr-status');if(label)label.textContent='No se pudo iniciar AR. Abre la simulación para continuar.';}
  }
- place(){if(this.backend==='native'&&!this.depthReady){this.message.textContent='SIN PROFUNDIDAD: NO SE COLOCARÁ EL MATERIAL SOBRE MUEBLES';this.status.textContent='REVISA ARCORE Y CHROME · MUEVE LENTAMENTE LA CÁMARA';return;}if(this.backend==='xr8'&&!this.isIOS){this.message.textContent='ESTE MODO ANDROID NO OFRECE PROFUNDIDAD; UTILIZA CHROME/ARCORE';return;}if(this.backend==='xr8'){const p=this.xr8Tracking?.lock();if(!p){this.message.textContent='BUSCA UNA SUPERFICIE ESTABLE';return;}this.hit=new pc.Vec3(p.x,p.y,p.z);}if(!this.hit){this.message.textContent='APUNTA A UNA SUPERFICIE HORIZONTAL';return;}this.placed=true;this.root.setPosition(this.hit);this.reticle.enabled=false;this.revealPlane.enabled=true;this.action.textContent='CAMBIAR MATERIAL';this.sliders.hidden=false;this.finish.hidden=false;this.reveal();if(this.backend!=='xr8'&&this.app.xr.anchors?.available && this.hitResult){try{this.app.xr.anchors.create(this.hitResult,(err,anchor)=>{if(!err&&anchor)this.anchor=anchor;});}catch{}}}
+ place(){if(this.backend==='xr8'){const p=this.xr8Tracking?.lock();if(!p){this.message.textContent='BUSCA UNA SUPERFICIE ESTABLE';return;}this.hit=new pc.Vec3(p.x,p.y,p.z);}if(!this.hit){this.message.textContent='APUNTA A UNA SUPERFICIE HORIZONTAL';return;}this.placed=true;this.root.setPosition(this.hit);this.reticle.enabled=false;this.revealPlane.enabled=true;this.action.textContent='CAMBIAR MATERIAL';this.sliders.hidden=false;this.finish.hidden=false;this.reveal();if(this.backend!=='xr8'&&this.app.xr.anchors?.available && this.hitResult){try{this.app.xr.anchors.create(this.hitResult,(err,anchor)=>{if(!err&&anchor)this.anchor=anchor;});}catch{}}}
  reveal(){if(!this.placed)return;const idx=this.materialIndex;if(this.lastIndex!==undefined){this.oldMat.setParameter('uFloorMap',this.textures[this.lastIndex]);this.basePlane.enabled=true;}else this.basePlane.enabled=false;this.newMat.setParameter('uFloorMap',this.textures[idx]);this.revealPlane.enabled=true;this.revealing=true;this.radius=0;this.timer=0;this.paintMask(0);this.message.textContent='REVELANDO MATERIAL...';}
  update(dt){if(!this.active)return;if(this.backend==='native'){this._applyNativeLight();this._updateDepthOcclusion();}this._updateFloorLighting();if(this.anchor&&this.placed){try{this.root.setPosition(this.anchor.getPosition());}catch{}}if(!this.revealing)return;this.timer=Math.min(1.35,this.timer+dt);this.radius=easing(this.timer/1.25)*(Math.hypot(this.width,this.depth)*.67+.3);this.paintMask(this.radius);if(this.timer>=1.25){this.revealing=false;this.lastIndex=this.materialIndex;this.oldMat.setParameter('uFloorMap',this.textures[this.materialIndex]);this.basePlane.enabled=true;this.revealPlane.enabled=false;this.message.textContent='PRUEBA OTRO ACABADO O TERMINA LA EXPERIENCIA';}}
  paintMask(radius){const w=128,h=128,im=this.maskCtx.createImageData(w,h),d=im.data;for(let y=0;y<h;y++)for(let x=0;x<w;x++){const px=(x/127-.5)*this.width,pz=(y/127-.5)*this.depth,t=Math.hypot(px,pz),a=Math.max(0,Math.min(1,(radius+.08-t)/.16));const v=Math.round(a*255),i=(y*w+x)*4;d[i]=d[i+1]=d[i+2]=v;d[i+3]=255;}this.maskCtx.putImageData(im,0,0);this.maskTex.setSource(this.mask);}
