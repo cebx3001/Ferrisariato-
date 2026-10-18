@@ -46,7 +46,7 @@ export class FerrisARViewer {
   this._wirePointer();this.nativeSupported=false;this.pendingXR8Fallback=false;this.xr8ExposureReference=null;this.hasARLightEstimate=false;this.resize();window.addEventListener('resize',()=>this.resize());
  }
  _setSurfaceState(state){if(this.surfaceState!==state){this.surfaceState=state;this.onSurface(state);}}
- _cameraLook(){if(this.session)return;let yaw=this.orbitYaw*Math.PI/180,p=this.orbitPitch*Math.PI/180;let px=this.distance*Math.sin(yaw)*Math.cos(p),py=this.distance*Math.sin(p)+1.45,pz=this.distance*Math.cos(yaw)*Math.cos(p);this.camera.setPosition(px,py,pz);this.camera.lookAt(0,this.item?.dimensions?clamp(this.item.dimensions[1]*.48,.28,1.5):1.14,0);}
+ _cameraLook(){if(this.session)return;let yaw=this.orbitYaw*Math.PI/180,p=this.orbitPitch*Math.PI/180;const compact=this.item?.dimensions&&this.item.dimensions[0]<1.4&&this.item.dimensions[1]<1.0;const focus=this.item?.dimensions?clamp(this.item.dimensions[1]*.48,.28,1.5):1.14;let px=this.distance*Math.sin(yaw)*Math.cos(p),py=this.distance*Math.sin(p)+(compact?focus:1.45),pz=this.distance*Math.cos(yaw)*Math.cos(p);this.camera.setPosition(px,py,pz);this.camera.lookAt(0,focus,0);}
  resize(){this.app.resizeCanvas(this.canvas.clientWidth||window.innerWidth,this.canvas.clientHeight||window.innerHeight);}
  get xr8Available(){return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || navigator.maxTouchPoints>1;}
  get isIOS(){return /iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);}
@@ -61,7 +61,7 @@ export class FerrisARViewer {
  async _instantiate(url){const asset=await this._loadGLB(url);return asset.resource.instantiateRenderEntity({castShadows:false});}
  _clear(){if(this.rootModel){this.rootModel.destroy();this.rootModel=null;}this.marker.enabled=false;}
  async select(product){this.item=product;const token=++this.selectedToken;this._clear();this.scale=1;this.yaw=0;this.onStatus('Cargando modelo 3D...');try{
-  if(!this.session){this.distance=clamp(Math.max(...product.dimensions)*1.65,3.5,18);this.orbitYaw=24;this.orbitPitch=19;this._cameraLook();}
+  if(!this.session){this.distance=clamp(Math.max(...product.dimensions)*1.65,(product.dimensions[0]<1.4&&product.dimensions[1]<1.0)?2.25:3.5,18);this.orbitYaw=24;this.orbitPitch=19;this._cameraLook();}
   const url=product.local;const root=await this._instantiate(url);if(token!==this.selectedToken){root.destroy();return;}this.rootModel=new pc.Entity('PRODUCT-'+product.id);this.rootModel.addChild(root);this.productRoot.addChild(this.rootModel);this._setTransform();this.shadow.setLocalScale(product.dimensions[0],1,product.dimensions[2]);this.hasPlaced=!this.session;this.productRoot.enabled=!this.session;if(this.session&&this.xrBackend==='xr8')this.xr8Tracking?.scanAgain();if(this.session)this._setSurfaceState('searching');this.onStatus('Modelo listo. Arrastra para girar la vista.');
   // Upgrade to sourced CC0 model when accessible, but retain local fallback if network/CDN fails.
   if(product.remote && !this.session) this._upgrade(product,token);
