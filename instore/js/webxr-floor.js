@@ -97,7 +97,7 @@ export class FloorWebXR {
    this.arLight.light.color=new pc.Color(c.r+(color.r-c.r)*.08,
      c.g+(color.g-c.g)*.08,c.b+(color.b-c.b)*.08);
   }
-  const q=est.rotation();if(q)this.arLight.setRotation(q);
+  const q=est.rotation;if(q)this.arLight.setRotation(q);
   const sh=est.sphericalHarmonics;
   if(sh?.length>=3&&[sh[0],sh[1],sh[2]].every(Number.isFinite)){
     const c=this.app.scene.ambientLight,v=n=>clamp(Math.max(0,n)*.2821,.12,.86);
