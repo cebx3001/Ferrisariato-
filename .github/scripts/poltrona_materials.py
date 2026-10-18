@@ -23,13 +23,13 @@ def write_texture(name, rgb, height, strength):
     arr=np.empty((N,N,4),dtype=np.float32)
     for i in range(3): arr[:,:,i]=np.clip(rgb[:,:,i]/255.,0,1)
     arr[:,:,3]=1
-    img.pixels.foreach_set(arr.reshape(-1));img.filepath_raw=str((dest/(name+"_color.png")).resolve());img.file_format='PNG';img.save()
+    img.pixels.foreach_set(arr.reshape(-1));img.filepath_raw=str((dest/(name+"_color.jpg")).resolve());img.file_format='JPEG';img.save()
     gy,gx=np.gradient(height)
     nx=-gx*strength;ny=-gy*strength
     inv=1/np.sqrt(nx*nx+ny*ny+1)
     norm=np.stack(((nx*inv+1)/2,(ny*inv+1)/2,inv,np.ones_like(nx)),axis=-1).astype(np.float32)
     nm=bpy.data.images.new(name+"_NORMAL",width=N,height=N,alpha=True)
-    nm.pixels.foreach_set(norm.reshape(-1));nm.filepath_raw=str((dest/(name+"_normal.png")).resolve());nm.file_format='PNG';nm.save()
+    nm.pixels.foreach_set(norm.reshape(-1));nm.filepath_raw=str((dest/(name+"_normal.jpg")).resolve());nm.file_format='JPEG';nm.save()
     return img,nm
 
 # A tight over-under woven charcoal wicker. The relief is raster-baked so WebGL sees it.
@@ -202,8 +202,8 @@ for name,pos in [("threequarter",(1.6,-2.2,1.35)),("front",(0,-2.8,.82)),("side"
     "glb_bytes":target.stat().st_size,
     "original_vertices":source_vertices,
     "enhanced_vertices":{o.name:len(o.data.vertices) for o in meshes},
-    "textures":["ratten_graphite_color.png","ratten_graphite_normal.png",
-                "cushion_slate_blue_color.png","cushion_slate_blue_normal.png",
-                "legs_dark_wood_color.png","legs_dark_wood_normal.png"]
+    "textures":["ratten_graphite_color.jpg","ratten_graphite_normal.jpg",
+                "cushion_slate_blue_color.jpg","cushion_slate_blue_normal.jpg",
+                "legs_dark_wood_color.jpg","legs_dark_wood_normal.jpg"]
 },indent=2))
 print("PASS",flush=True)
