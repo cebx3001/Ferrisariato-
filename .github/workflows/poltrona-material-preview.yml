@@ -1,0 +1,61 @@
+name: Poltrona PL 461 material preview (isolated)
+on:
+  push:
+    branches: [poltrona-materials-review]
+    paths:
+      - '.github/workflows/poltrona-material-preview.yml'
+      - '.github/scripts/poltrona_materials.py'
+      - '.github/assets/poltrona.000.b64'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  reconstruct-materials:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Restore original source and install Blender
+        shell: bash
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y zstd libgl1 libx11-6 libxi6 libxxf86vm1
+          mkdir -p /tmp/poltrona
+          base64 --decode .github/assets/poltrona.000.b64 | zstd -dc > /tmp/poltrona/original.blend
+          test "$(head -c 7 /tmp/poltrona/original.blend)" = "BLENDER"
+          curl --fail --location --retry 3 --output /tmp/blender.tar.xz https://download.blender.org/release/Blender5.2/blender-5.2.2-linux-x64.tar.xz
+          mkdir -p /tmp/blender
+          tar -xf /tmp/blender.tar.xz -C /tmp/blender --strip-components=1
+          /tmp/blender/blender --version | head -1
+      - name: Repair materials, export and render from the original .blend
+        shell: bash
+        run: |
+          /tmp/blender/blender --background --factory-startup --threads 2 --python-exit-code 7 --python .github/scripts/poltrona_materials.py -- /tmp/poltrona/original.blend home/assets/preview-poltrona
+      - name: Verify GLB embeds all three textured PBR families
+        run: |
+          python3 - <<'PY'
+          import json,struct
+          from pathlib import Path
+          p=Path('home/assets/preview-poltrona/poltrona-pl-461-textured.glb')
+          b=p.read_bytes()
+          size,ctype=struct.unpack_from('<II',b,12)
+          doc=json.loads(b[20:20+size])
+          assert len(doc.get('images',[]))>=6,doc.get('images')
+          assert len(doc.get('textures',[]))>=6,doc.get('textures')
+          for mat in doc['materials']:
+              assert mat['pbrMetallicRoughness']['baseColorTexture'],mat
+              assert mat['normalTexture'],mat
+          print('PASS',p.stat().st_size,[x['name'] for x in doc['materials']],len(doc['images']))
+          PY
+      - name: Commit only isolated preview assets
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add home/assets/preview-poltrona
+          if ! git diff --staged --quiet; then
+            git commit -m 'Build isolated Poltrona wicker/fabric/wood material preview'
+            git push
+          fi
