@@ -100,7 +100,7 @@ export class FerrisARViewer {
    this.light.light.color=new pc.Color(c.r+(color.r-c.r)*.1,
     c.g+(color.g-c.g)*.1,c.b+(color.b-c.b)*.1);
   }
-  const rot=e.rotation();if(rot)this.light.setRotation(rot);
+  const rot=e.rotation;if(rot)this.light.setRotation(rot);
   const sh=e.sphericalHarmonics;
   if(sh?.length>=3&&[sh[0],sh[1],sh[2]].every(Number.isFinite)){
    // The constant spherical-harmonic term is a stable ambient approximation.
