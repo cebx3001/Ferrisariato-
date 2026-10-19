@@ -1,7 +1,7 @@
 {
   "source": "original.blend",
   "model": "Poltrona PL 461",
-  "mesh_count": 5,
+  "mesh_count": 8,
   "source_materials": [
     [
       "Cube",
@@ -27,6 +27,21 @@
       "Plane.002",
       "Madeira gen\u00e9rica",
       "wood"
+    ],
+    [
+      "Foot.MirrorX",
+      "Madeira gen\u00e9rica",
+      "wood"
+    ],
+    [
+      "Foot.MirrorY",
+      "Madeira gen\u00e9rica",
+      "wood"
+    ],
+    [
+      "Foot.MirrorXY",
+      "Madeira gen\u00e9rica",
+      "wood"
     ]
   ],
   "dimensions_m": [
@@ -34,21 +49,33 @@
     0.7263,
     0.6933
   ],
-  "glb_bytes": 1890096,
+  "glb_bytes": 1929860,
   "original_vertices": {
     "Cube": 16,
     "Cube.001": 8,
     "Plane": 146,
     "Plane.001": 322,
-    "Plane.002": 16
+    "Plane.002": 16,
+    "Foot.MirrorX": 16,
+    "Foot.MirrorY": 16,
+    "Foot.MirrorXY": 16
   },
   "enhanced_vertices": {
     "Cube": 192,
     "Cube.001": 96,
     "Plane": 2306,
     "Plane.001": 5122,
-    "Plane.002": 96
+    "Plane.002": 96,
+    "Foot.MirrorX": 96,
+    "Foot.MirrorY": 96,
+    "Foot.MirrorXY": 96
   },
+  "restored_feet": [
+    "Plane.002",
+    "Foot.MirrorX",
+    "Foot.MirrorY",
+    "Foot.MirrorXY"
+  ],
   "textures": [
     "ratten_graphite_color.jpg",
     "ratten_graphite_normal.jpg",
