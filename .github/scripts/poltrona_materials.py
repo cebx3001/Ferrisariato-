@@ -21,6 +21,30 @@ for obj in bpy.data.objects:
           'HIDE',obj.hide_render,flush=True)
 
 meshes=[o for o in bpy.data.objects if o.type=='MESH' and o.name in {'Cube','Cube.001','Plane','Plane.001','Plane.002'} and len(o.data.vertices)>0]
+
+# Restore THREE absent wooden feet using mirrored, identical copies of the
+# only original wooden foot. No unrelated scene objects are included.
+original_leg=next(o for o in meshes if o.name=="Plane.002")
+original_coords=[original_leg.matrix_world @ v.co for v in original_leg.data.vertices]
+assert max(v.x for v in original_coords)<-.3
+assert max(v.y for v in original_coords)<-.15
+feet=[original_leg]
+for suffix,sx,sy in [("MirrorX",-1,1),("MirrorY",1,-1),("MirrorXY",-1,-1)]:
+    o=original_leg.copy()
+    o.data=original_leg.data.copy()
+    bpy.context.collection.objects.link(o)
+    o.name="Foot."+suffix
+    # Original leg uses identity object transform: mirror mesh around center
+    # so each copy keeps its taper/splay and stays on the same real floor.
+    assert all(abs(o.matrix_world[i][j]-(1 if i==j else 0))<.00001 for i in range(4) for j in range(4))
+    for v in o.data.vertices:
+        v.co.x*=sx;v.co.y*=sy
+    if sx*sy<0:o.data.flip_normals()
+    feet.append(o)
+    meshes.append(o)
+assert len(feet)==4
+print("FOOT_RESTORATION",[(o.name,len(o.data.vertices)) for o in feet],flush=True)
+
 # Source also contains untextured auxiliary Plane.003 and Referencia; they are not parts of this chair.
 if not meshes: raise RuntimeError("No original meshes!")
 print("SOURCE",[(o.name,len(o.data.vertices),[m.name for m in o.data.materials if m]) for o in meshes],flush=True)
@@ -150,7 +174,7 @@ for o in meshes:o.matrix_world=fix@world[o]
 
 # Refine all feet with small beveled edges in meters; keep their positions and heights.
 for o in meshes:
-    if o.name not in ('Cube','Cube.001','Plane.002'):continue
+    if o.name not in ('Cube','Cube.001','Plane.002') and not o.name.startswith('Foot.'):continue
     for other in bpy.context.selected_objects:other.select_set(False)
     o.select_set(True);bpy.context.view_layer.objects.active=o
     bevel=o.modifiers.new('Wood foot edge refinement','BEVEL')
@@ -159,6 +183,19 @@ for o in meshes:
     bevel.limit_method='ANGLE'
     try:bpy.ops.object.modifier_apply(modifier=bevel.name)
     except Exception as exc:print('BEVEL_SKIP',o.name,str(exc),flush=True)
+
+
+# Precise ground test after real-world normalization: FOUR distinct feet.
+feet_bboxes=[]
+for o in feet:
+    pts=[o.matrix_world@v.co for v in o.data.vertices]
+    lo=[min(v[i] for v in pts) for i in range(3)]
+    hi=[max(v[i] for v in pts) for i in range(3)]
+    feet_bboxes.append({"name":o.name,"min":lo,"max":hi,"center":[(lo[0]+hi[0])/2,(lo[1]+hi[1])/2]})
+assert all(abs(x["min"][2])<.012 for x in feet_bboxes),feet_bboxes
+centers={(1 if x["center"][0]>0 else -1,1 if x["center"][1]>0 else -1) for x in feet_bboxes}
+assert len(centers)==4,feet_bboxes
+print("FOUR_GROUNDED_FEET",feet_bboxes,flush=True)
 
 for o in bpy.context.selected_objects:o.select_set(False)
 for o in meshes:o.select_set(True)
@@ -214,6 +251,7 @@ for name,pos in [("threequarter",(1.6,-2.2,1.35)),("front",(0,-2.8,.82)),("side"
     "glb_bytes":target.stat().st_size,
     "original_vertices":source_vertices,
     "enhanced_vertices":{o.name:len(o.data.vertices) for o in meshes},
+    "restored_feet":[o.name for o in feet],
     "textures":["ratten_graphite_color.jpg","ratten_graphite_normal.jpg",
                 "cushion_slate_blue_color.jpg","cushion_slate_blue_normal.jpg",
                 "legs_dark_wood_color.jpg","legs_dark_wood_normal.jpg"]
