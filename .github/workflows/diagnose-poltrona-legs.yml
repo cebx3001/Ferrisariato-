@@ -1,0 +1,15 @@
+name: Diagnose published Poltrona GLB geometry
+on:
+  push:
+    branches: [qa-poltrona-legs-20261019]
+  workflow_dispatch:
+jobs:
+  inspect-poltrona-only:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect actual published GLB nodes, leg coordinates and materials
+        run: |
+          python -m pip install -q numpy trimesh
+          python .github/scripts/diagnose-poltrona-legs.py
