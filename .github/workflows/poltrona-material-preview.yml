@@ -1,7 +1,7 @@
 name: Poltrona PL 461 material preview (isolated)
 on:
   push:
-    branches: [poltrona-materials-review, poltrona-quality-review]
+    branches: [poltrona-materials-review, poltrona-quality-review, poltrona-restore-missing-legs]
     paths:
       - '.github/workflows/poltrona-material-preview.yml'
       - '.github/scripts/poltrona_materials.py'
