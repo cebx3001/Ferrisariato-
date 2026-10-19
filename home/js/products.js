@@ -43,8 +43,8 @@ export const PRODUCTS = [
     "category": "SILLÓN DE EXTERIOR",
     "short": "Ratán grafito, cojín azul grisáceo y madera oscura",
     "description": "Sillón envolvente de ratán oscuro con cojín azul grisáceo y patas de madera. Examina sus acabados y visualízalo en tu propio espacio mediante WebAR.",
-    "thumb": "./assets/img/poltrona-pl-461.png?v=home-ar-repair-20261018b",
-    "local": "./assets/models/poltrona-pl-461.glb?v=home-ar-repair-20261018b",
+    "thumb": "./assets/img/poltrona-pl-461.png?v=poltrona-four-legs-20261019",
+    "local": "./assets/models/poltrona-pl-461.glb?v=poltrona-four-legs-20261019",
     "pack": null,
     "remote": null,
     "modelReady": true,
@@ -54,6 +54,6 @@ export const PRODUCTS = [
       0.7001
     ],
     "source": "Poltrona+PL+461 (1).blend, geometría original y materiales PBR reconstruidos",
-    "previewThumb": "./assets/img/poltrona-pl-461.png"
+    "previewThumb": "./assets/img/poltrona-pl-461.png?v=poltrona-four-legs-20261019"
   }
 ];
